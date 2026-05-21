@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SRT Royal — Elite Frontend Designers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+</head>
+<body>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a class="nav-logo" href="#home">
+        <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+        <span class="logo-text">SRT <span class="logo-accent">Royal</span></span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+        <li><a href="#designers" class="nav-link">Designers</a></li>
+        <li><a href="#hire" class="nav-link">Hire</a></li>
+        <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+        <li><a href="#auth-section" class="nav-link nav-login-link" id="navAuthLink">Login</a></li>
+        <li><a href="#profile-section" class="nav-link nav-login-link hidden" id="navProfileLink">My Account</a></li>
+        <li><a href="#hire" class="btn btn-gold nav-cta">Hire a Designer</a></li>
+      </ul>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" id="home">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-glow glow-1"></div>
+    <div class="hero-glow glow-2"></div>
+    <div class="hero-container">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Trusted by 50+ clients worldwide</span>
+      </div>
+      <h1 class="hero-headline">
+        Find <span class="text-gold">Elite</span> Frontend<br/>Designers
+      </h1>
+      <p class="hero-sub">
+        Connect with handpicked, world-class frontend web designers who deliver pixel-perfect,
+        high-performance websites that convert visitors into customers.
+      </p>
+      <div class="hero-actions">
+        <a href="#hire" class="btn btn-gold btn-lg">
+          <span>Start a Project</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#designers" class="btn btn-outline btn-lg">Browse Designers</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-val">50+</span>
+          <span class="stat-lbl">Projects Done</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="stat-val">100%</span>
+          <span class="stat-lbl">Satisfaction Rate</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="stat-val">24h</span>
+          <span class="stat-lbl">Response Time</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+      <span>Scroll to explore</span>
+    </div>
+  </section>
+
+  <!-- ══════════════ HOW IT WORKS ══════════════ -->
+  <section class="section hiw-section" id="how-it-works">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Simple Process</span>
+        <h2 class="section-title">How It <span class="text-gold">Works</span></h2>
+        <p class="section-desc">From idea to live website in three simple steps</p>
+      </div>
+      <div class="hiw-grid">
+        <div class="hiw-card reveal">
+          <div class="hiw-icon-wrap">
+            <div class="hiw-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <span class="hiw-step-num">01</span>
+          </div>
+          <h3>Browse Designers</h3>
+          <p>Explore our curated roster of elite frontend designers. Review portfolios, skills, and past work to find your perfect match.</p>
+        </div>
+        <div class="hiw-connector reveal"></div>
+        <div class="hiw-card reveal">
+          <div class="hiw-icon-wrap">
+            <div class="hiw-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+            </div>
+            <span class="hiw-step-num">02</span>
+          </div>
+          <h3>Submit Your Brief</h3>
+          <p>Fill out our detailed hire request form with your project scope, budget, timeline, and design preferences.</p>
+        </div>
+        <div class="hiw-connector reveal"></div>
+        <div class="hiw-card reveal">
+          <div class="hiw-icon-wrap">
+            <div class="hiw-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.18h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.1 6.1l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <span class="hiw-step-num">03</span>
+          </div>
+          <h3>Get Connected</h3>
+          <p>We match you with the best designer for your needs. Expect a response within 24 hours to kick off your project.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FEATURED DESIGNERS ══════════════ -->
+  <section class="section designers-section" id="designers">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Our Talent</span>
+        <h2 class="section-title">Featured <span class="text-gold">Designers</span></h2>
+        <p class="section-desc">Handpicked professionals ready to bring your vision to life</p>
+      </div>
+      <div class="designers-grid">
+
+        <div class="designer-card reveal">
+          <div class="designer-card-top">
+            <div class="designer-avatar-wrap">
+              <img src="T.jpg" alt="Sr. Tawsif" class="designer-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Tawsif&background=FFD700&color=0A0F1E&size=80'"/>
+              <span class="designer-available-dot"></span>
+            </div>
+            <div class="designer-info">
+              <h3 class="designer-name">Sr. Tawsif</h3>
+              <p class="designer-title">Lead Frontend Designer</p>
+              <div class="designer-rating">
+                <span class="stars">★★★★★</span>
+                <span class="rating-val">5.0</span>
+                <span class="rating-count">(24 reviews)</span>
+              </div>
+            </div>
+            <span class="designer-badge badge-top">⚡ Top Pick</span>
+          </div>
+          <div class="designer-skills">
+            <span class="skill-tag">HTML/CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">UI Design</span>
+            <span class="skill-tag">Responsive</span>
+          </div>
+          <div class="designer-footer">
+            <div class="designer-meta">
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Bangladesh
+              </span>
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                2+ yrs exp
+              </span>
+            </div>
+            <a href="#hire" class="btn btn-gold btn-sm">Hire Now</a>
+          </div>
+        </div>
+          <div class="designer-footer">
+            <div class="designer-meta">
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Bangladesh
+              </span>
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                3+ yrs exp
+              </span>
+            </div>
+            <a href="#hire" class="btn btn-gold btn-sm">Hire Now</a>
+          </div>
+        </div>
+
+  <!-- ══════════════ HIRE REQUEST FORM ══════════════ -->
+  <section class="section hire-section" id="hire">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Start Today</span>
+        <h2 class="section-title">Submit a <span class="text-gold">Hire Request</span></h2>
+        <p class="section-desc">Tell us about your project — we'll connect you with the right designer within 24 hours</p>
+      </div>
+      <div class="hire-layout">
+        <div class="hire-info reveal">
+          <h3>Why choose SRT Royal?</h3>
+          <div class="hire-feature">
+            <div class="hf-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Vetted Professionals</strong>
+              <p>Every designer passes a rigorous skill assessment before joining our platform.</p>
+            </div>
+          </div>
+          <div class="hire-feature">
+            <div class="hf-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Fast Turnaround</strong>
+              <p>Get a response within 24 hours. Most projects kick off within 48 hours.</p>
+            </div>
+          </div>
+          <div class="hire-feature">
+            <div class="hf-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>Transparent Pricing</strong>
+              <p>No hidden fees. Clear, upfront pricing agreed before any work begins.</p>
+            </div>
+          </div>
+          <div class="hire-feature">
+            <div class="hf-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <strong>100% Satisfaction</strong>
+              <p>We revise until you're completely happy with the result.</p>
+            </div>
+          </div>
+          <div class="hire-contact-quick">
+            <p>Prefer to talk directly?</p>
+            <a href="https://wa.me/8801976365076" target="_blank" class="btn btn-whatsapp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Chat on WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <form class="hire-form reveal" id="hireForm" novalidate>
+          <div class="form-group">
+            <label for="projectTitle">Project Title <span class="req">*</span></label>
+            <input type="text" id="projectTitle" placeholder="e.g. E-commerce Landing Page" required/>
+          </div>
+          <div class="form-group">
+            <label for="projectDesc">Project Description <span class="req">*</span></label>
+            <textarea id="projectDesc" rows="4" placeholder="Describe your project, goals, and any references you like…" required></textarea>
+          </div>
+          <div class="form-row-two">
+            <div class="form-group">
+              <label for="projectBudget">Budget Range <span class="req">*</span></label>
+              <select id="projectBudget" required>
+                <option value="" disabled selected>Select budget</option>
+                <option>Under $100</option>
+                <option>$100 – $300</option>
+                <option>$300 – $600</option>
+                <option>$600 – $1,000</option>
+                <option>$1,000 – $2,000</option>
+                <option>$2,000+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="projectTimeline">Timeline <span class="req">*</span></label>
+              <select id="projectTimeline" required>
+                <option value="" disabled selected>Select timeline</option>
+                <option>Less than 1 week</option>
+                <option>1 – 2 weeks</option>
+                <option>2 – 4 weeks</option>
+                <option>1 – 2 months</option>
+                <option>Flexible</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="designStyle">Design Style</label>
+            <select id="designStyle">
+              <option value="" disabled selected>Select a style</option>
+              <option>Minimalist & Clean</option>
+              <option>Bold & Modern</option>
+              <option>Luxury / Premium</option>
+              <option>Playful / Creative</option>
+              <option>Corporate / Professional</option>
+              <option>Dark / Dramatic</option>
+              <option>Other / Open to suggestions</option>
+            </select>
+          </div>
+          <div class="form-row-two">
+            <div class="form-group">
+              <label for="clientName">Your Name <span class="req">*</span></label>
+              <input type="text" id="clientName" placeholder="Full name" required/>
+            </div>
+            <div class="form-group">
+              <label for="clientEmail">Email <span class="req">*</span></label>
+              <input type="email" id="clientEmail" placeholder="your@email.com" required/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="clientWhatsapp">WhatsApp Number</label>
+            <input type="tel" id="clientWhatsapp" placeholder="+880 1XXX-XXXXXX"/>
+          </div>
+          <button type="submit" class="btn btn-gold btn-full" id="hireSubmitBtn">
+            <span class="btn-text">Send Hire Request →</span>
+            <span class="btn-loading hidden">Sending…</span>
+          </button>
+          <p class="form-note">We'll respond within 24 hours. Your info is kept private.</p>
+          <p class="form-success hidden" id="hireSuccess">✅ Request received! We'll be in touch within 24 hours.</p>
+          <p class="form-error hidden" id="hireError">❌ Something went wrong. Please try WhatsApp instead.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ TESTIMONIALS ══════════════ -->
+  <section class="section testimonials-section" id="testimonials">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Client Love</span>
+        <h2 class="section-title">What Clients <span class="text-gold">Say</span></h2>
+        <p class="section-desc">Real reviews from real clients who've worked with our designers</p>
+      </div>
+      <div class="testimonials-grid" id="testimonialsList">
+        <div class="testimonial-card reveal">
+          <div class="tcard-top">
+            <div class="tcard-stars">★★★★★</div>
+            <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+          </div>
+          <p class="tcard-text">Tawsif delivered an absolutely stunning website for my business. The attention to detail, the animations, the mobile responsiveness — everything was perfect. I got 3 new clients in the first week after launch!</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar">A</div>
+            <div>
+              <strong>Ahmed Rahman</strong>
+              <span>Business Owner, Dhaka</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="tcard-top">
+            <div class="tcard-stars">★★★★★</div>
+            <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+          </div>
+          <p class="tcard-text">I've worked with many freelance designers before, but SRT Royal is on another level. Fast communication, creative ideas, and the final product exceeded my expectations. Highly recommend!</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar">S</div>
+            <div>
+              <strong>Sarah K.</strong>
+              <span>Startup Founder</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card reveal">
+          <div class="tcard-top">
+            <div class="tcard-stars">★★★★★</div>
+            <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+          </div>
+          <p class="tcard-text">The landing page they built for my agency doubled our conversion rate. Clean design, fast loading, and looks incredible on every device. This is what professional work looks like.</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar">M</div>
+            <div>
+              <strong>Mohammad T.</strong>
+              <span>Agency Director</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leave a review -->
+      <div class="leave-review-wrap reveal">
+        <h3>Leave Your Review</h3>
+        <div class="star-picker" id="starPicker">
+          <span class="rstar active" data-v="1">★</span>
+          <span class="rstar active" data-v="2">★</span>
+          <span class="rstar active" data-v="3">★</span>
+          <span class="rstar active" data-v="4">★</span>
+          <span class="rstar active" data-v="5">★</span>
+        </div>
+        <div class="review-form-grid">
+          <input type="text" id="rName" placeholder="Your name" class="rinput"/>
+          <input type="text" id="rRole" placeholder="Your role / company" class="rinput"/>
+        </div>
+        <textarea id="rText" rows="3" placeholder="Share your experience working with us…" class="rinput"></textarea>
+        <button class="btn btn-outline" id="submitReviewBtn">Submit Review</button>
+        <p class="form-success hidden" id="reviewSuccess">✅ Thank you for your review!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ AUTH SECTION ══════════════ -->
+  <section class="section auth-section-wrap" id="auth-section">
+    <div class="container">
+      <div class="auth-card reveal">
+        <div class="auth-card-deco"></div>
+        <div class="section-header" style="margin-bottom:2rem;">
+          <span class="section-tag">Client Portal</span>
+          <h2 class="section-title" style="font-size:2rem;">Track Your <span class="text-gold">Projects</span></h2>
+          <p class="section-desc">Sign in to manage your hire requests and project status</p>
+        </div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tabSignin">Sign In</button>
+          <button class="auth-tab" id="tabSignup">Sign Up</button>
+        </div>
+
+        <div id="signinForm" class="auth-form">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" placeholder="your@email.com"/>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••"/>
+          </div>
+          <button class="btn btn-gold btn-full" id="loginBtn">Sign In</button>
+          <p class="form-error hidden" id="loginError"></p>
+        </div>
+
+        <div id="signupForm" class="auth-form hidden">
+          <div class="form-row-two">
+            <div class="form-group">
+              <label>Full Name <span class="req">*</span></label>
+              <input type="text" id="signupName" placeholder="Your name"/>
+            </div>
+            <div class="form-group">
+              <label>Email <span class="req">*</span></label>
+              <input type="email" id="signupEmail" placeholder="your@email.com"/>
+            </div>
+          </div>
+          <div class="form-row-two">
+            <div class="form-group">
+              <label>Company</label>
+              <input type="text" id="signupCompany" placeholder="Your company (optional)"/>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="text" id="signupPhone" placeholder="+880… (optional)"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Password <span class="req">*</span></label>
+            <input type="password" id="signupPassword" placeholder="••••••••"/>
+          </div>
+          <button class="btn btn-gold btn-full" id="signupBtn">Create Account</button>
+          <p class="form-error hidden" id="signupError"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ PROFILE SECTION ══════════════ -->
+  <section class="section profile-section-wrap hidden" id="profile-section">
+    <div class="container">
+      <div class="profile-card reveal">
+        <div id="profileContent"><!-- filled by app.js --></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer" id="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-brand-col">
+          <a class="footer-logo" href="#home">
+            <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+            <span>SRT <span class="logo-accent">Royal</span></span>
+          </a>
+          <p class="footer-tagline">Connecting businesses with elite frontend designers who build websites that work — and look incredible doing it.</p>
+          <div class="footer-socials">
+            <a href="https://github.com/tawsifgaming373-bot" target="_blank" class="social-link" aria-label="GitHub">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://wa.me/8801976365076" target="_blank" class="social-link" aria-label="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            </a>
+            <a href="mailto:tawsifgaming373@gmail.com" class="social-link" aria-label="Email">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#designers">Browse Designers</a></li>
+            <li><a href="#hire">Submit a Request</a></li>
+            <li><a href="#testimonials">Client Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#home">About SRT Royal</a></li>
+            <li><a href="https://github.com/tawsifgaming373-bot/SRT-Royal-Site" target="_blank">GitHub</a></li>
+            <li><a href="#auth-section">Client Portal</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:tawsifgaming373@gmail.com">tawsifgaming373@gmail.com</a></li>
+            <li><a href="https://wa.me/8801976365076" target="_blank">+880 1976-365076</a></li>
+            <li><span style="color:var(--text-muted)">Bangladesh 🇧🇩</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <span>© 2025 SRT Royal. All rights reserved.</span>
+        <span>Built with ♥ in Bangladesh</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp FAB -->
+  <a class="whatsapp-fab" href="https://wa.me/8801976365076" target="_blank" aria-label="WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" width="26" height="26"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <script src="app.js"></script>
+</body>
+</html>
