@@ -1148,3 +1148,115 @@ h1,h2,h3,h4 { font-family: var(--font-head); line-height: 1.15; }
 
 /* ─── SELECTION ─── */
 ::selection { background: rgba(255,215,0,.25); color: var(--white); }
+/* WhatsApp Button */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 26px;
+  background: rgba(37,211,102,.12);
+  border: 1px solid rgba(37,211,102,.3);
+  border-radius: var(--radius);
+  color: #25d366;
+  font-weight: 600;
+  font-size: .92rem;
+  transition: var(--transition);
+}
+.btn-whatsapp:hover {
+  background: rgba(37,211,102,.2);
+  transform: translateY(-2px);
+}
+
+/* WhatsApp FAB */
+.whatsapp-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  background: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 4px 20px rgba(37,211,102,.4);
+  transition: var(--transition);
+  z-index: 99;
+}
+.whatsapp-fab:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 30px rgba(37,211,102,.6);
+}
+
+/* Footer Styles */
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+.footer-col h4 {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 18px;
+}
+.footer-col ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-col a {
+  font-size: .88rem;
+  color: var(--text-muted);
+  transition: var(--transition);
+}
+.footer-col a:hover {
+  color: var(--gold);
+}
+
+.footer-socials {
+  display: flex;
+  gap: 14px;
+  margin-top: 20px;
+}
+.social-link {
+  width: 40px;
+  height: 40px;
+  background: rgba(255,215,0,.08);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  transition: var(--transition);
+}
+.social-link:hover {
+  background: var(--gold);
+  color: var(--navy);
+}
+
+.footer-bottom {
+  border-top: 1px solid var(--border);
+  padding: 28px 0;
+}
+.footer-bottom-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .85rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 36px;
+  }
+  .footer-bottom-inner {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}
