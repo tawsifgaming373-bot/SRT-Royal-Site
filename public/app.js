@@ -124,88 +124,31 @@ const revealObs = new IntersectionObserver((entries) => {
 }, { threshold: 0.12 });
 revealEls.forEach((el) => { el.classList.add("reveal"); revealObs.observe(el); });
 
-/* ─────────────────────────────────────────────
-   HIRE REQUEST FORM
-───────────────────────────────────────────── */
-const hireForm = $("#hireForm");
+// Hire form submit handler
+document.addEventListener("DOMContentLoaded", () => {
+  const hireForm = document.getElementById("hireForm");
+  const successMsg = document.getElementById("hireSuccess");
+  const errorMsg = document.getElementById("hireError");
 
-hireForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  if (hireForm) {
+    hireForm.addEventListener("submit", function(e) {
+      e.preventDefault();
 
-  const btn       = $("#hireSubmitBtn");
-  const btnText   = btn?.querySelector(".btn-text");
-  const btnLoad   = btn?.querySelector(".btn-loading");
-  const successEl = $("#hireSuccess");
-  const errorEl   = $("#hireError");
-
-  hideMsg(successEl); hideMsg(errorEl);
-
-  const data = {
-    projectTitle: $("#projectTitle")?.value.trim(),
-    projectDesc:  $("#projectDesc")?.value.trim(),
-    budget:       $("#projectBudget")?.value,
-    timeline:     $("#projectTimeline")?.value,
-    designStyle:  $("#designStyle")?.value || "Not specified",
-    name:         $("#clientName")?.value.trim(),
-    email:        $("#clientEmail")?.value.trim(),
-    whatsapp:     $("#clientWhatsapp")?.value.trim() || "Not provided",
-  };
-
-  // Basic validation
-  const required = ["projectTitle","projectDesc","budget","timeline","name","email"];
-  for (const k of required) {
-    if (!data[k]) {
-      showMsg(errorEl, "❌ Please fill in all required fields.", true);
-      return;
-    }
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-    showMsg(errorEl, "❌ Please enter a valid email address.", true);
-    return;
-  }
-
-  btn.disabled = true;
-  btnText?.classList.add("hidden");
-  btnLoad?.classList.remove("hidden");
-
-  try {
-    // 1) Send via EmailJS
-    if (typeof emailjs !== "undefined") {
-      await emailjs.send("service_g2090y4", "template_eyd4am8", {
-        name:         data.name,
-        email:        data.email,
-        whatsapp:     data.whatsapp,
-        projectTitle: data.projectTitle,
-        budget:       data.budget,
-        timeline:     data.timeline,
-        designStyle:  data.designStyle,
-        message:      data.projectDesc,
-      });
-    }
-
-    // 2) Also POST to backend (optional — ignored if endpoint missing)
-    try {
-      await fetch(`${API_BASE}/api/hire`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(getToken() ? { Authorization: `Bearer ${getToken()}` } : {}),
-        },
-        body: JSON.stringify(data),
-      });
-    } catch (_) { /* backend optional */ }
-
-    showMsg(successEl, "✅ Request received! We'll be in touch within 24 hours.");
-    hireForm.reset();
-  } catch (err) {
-    console.error("Hire form error:", err);
-    showMsg(errorEl, "❌ Something went wrong. Please try WhatsApp instead.", true);
-  } finally {
-    btn.disabled = false;
-    btnText?.classList.remove("hidden");
-    btnLoad?.classList.add("hidden");
+      // EmailJS ব্যবহার করলে:
+      emailjs.sendForm("your_service_id", "your_template_id", this)
+        .then(() => {
+          successMsg.classList.remove("hidden");
+          errorMsg.classList.add("hidden");
+          hireForm.reset();
+        })
+        .catch(() => {
+          errorMsg.classList.remove("hidden");
+          successMsg.classList.add("hidden");
+        });
+    });
   }
 });
+
 
 /* ─────────────────────────────────────────────
    AUTH TABS (Sign In / Sign Up)
