@@ -32,6 +32,16 @@
 }
 
 html { scroll-behavior: smooth; }
+/* ─── PAGE TRANSITION EFFECT ─── */
+section {
+  transition: opacity 0.3s ease, display 0.3s ease;
+  opacity: 1;
+}
+
+section:not(#home) {
+  display: none;
+  opacity: 0;
+}
 
 body {
   font-family: var(--font-body);
