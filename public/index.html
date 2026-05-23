@@ -12,35 +12,34 @@
 </head>
 <body>
 
-  <!-- ══════════════ NAVBAR ══════════════ -->
-  <nav class="navbar" id="navbar">
-    <div class="nav-container">
-      <a class="nav-logo" href="#home">
-        <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
-        <span class="logo-text">SRT <span class="logo-accent">Royal</span></span>
-      </a>
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-container">
+    <a class="nav-logo" href="#home">
+      <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+      <span class="logo-text">SRT <span class="logo-accent">Royal</span></span>
+    </a>
 
-      <ul class="nav-links" id="navLinks">
-        <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
-        <li><a href="#designers" class="nav-link">Designers</a></li>
-        <li>
-  <button onclick="document.getElementById('hire').scrollIntoView({behavior:'smooth'})" 
-          class="btn btn-gold nav-cta">
-    Hire a Designer
-  </button>
-</li>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+      <li><a href="#designers" class="nav-link">Designers</a></li>
+      <li>
+        <button onclick="document.getElementById('hire').scrollIntoView({behavior:'smooth'})" 
+                class="btn btn-gold nav-cta">
+          Hire a Designer
+        </button>
+      </li>
+      <li><a href="#testimonials" class="nav-link">Reviews</a></li>
+      <li><a href="#auth-section" class="nav-link nav-login-link" id="navAuthLink">Login</a></li>
+      <li><a href="#profile-section" class="nav-link nav-login-link hidden" id="navProfileLink">My Account</a></li>
+    </ul>
 
-        <li><a href="#testimonials" class="nav-link">Reviews</a></li>
-        <li><a href="#auth-section" class="nav-link nav-login-link" id="navAuthLink">Login</a></li>
-        <li><a href="#profile-section" class="nav-link nav-login-link hidden" id="navProfileLink">My Account</a></li>
-        <li><button onclick="document.getElementById('hire').scrollIntoView({behavior:'smooth'})" class="btn btn-gold nav-cta">Hire a Designer</button></li>
-      </ul>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
 
-      <button class="hamburger" id="hamburger" aria-label="Menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </nav>
 
   <!-- ══════════════ HERO ══════════════ -->
   <section class="hero" id="home">
