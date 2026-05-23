@@ -54,8 +54,37 @@ hamburger?.addEventListener("click", () => {
   hamburger.setAttribute("aria-expanded", String(!!open));
 });
 
+// ✅ নতুন কোড (Line 57-77)
 $$(".nav-link").forEach((link) => {
-  link.addEventListener("click", () => {
+  link.addEventListener("click", (e) => {
+    const href = link.getAttribute("href");
+    
+    // শুধুমাত্র অ্যাঙ্করলিংক (#দিয়ে শুরু) এর জন্য
+    if (href && href.startsWith("#")) {
+      e.preventDefault();
+      
+      const targetId = href.substring(1);
+      const targetSection = $(`#${targetId}`);
+      
+      if (targetSection) {
+        // সব সেকশন লুকান
+        $$("section[id]").forEach(sec => {
+          sec.style.opacity = "0";
+          sec.style.pointerEvents = "none";
+          setTimeout(() => sec.style.display = "none", 300);
+        });
+        
+        // টার্গেট সেকশন দেখান
+        setTimeout(() => {
+          targetSection.style.display = "block";
+          targetSection.style.opacity = "1";
+          targetSection.style.pointerEvents = "auto";
+          targetSection.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
+    }
+    
+    // মোবাইল মেনু বন্ধ করুন
     navLinks?.classList.remove("open");
     hamburger?.classList.remove("active");
     hamburger?.setAttribute("aria-expanded", "false");
