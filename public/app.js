@@ -160,7 +160,7 @@ hireForm?.addEventListener("submit", async (e) => {
 
   try {
     if (typeof emailjs !== "undefined") {
-      await emailjs.send("service_g2090y4", "template_eyd4am8", {
+      await emailjs.send("service_g2090y4", "template_e1d12pf", {
         name:         data.name,
         email:        data.email,
         whatsapp:     data.whatsapp,
