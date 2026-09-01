@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SRT ROYAL Design — Frontend Development With Royal Precision</title>
+  <meta name="description" content="SRT ROYAL Design is a frontend development studio building responsive, high-performance, pixel-perfect websites with clean code and modern UI."/>
+  <meta property="og:title" content="SRT ROYAL Design — Frontend Development With Royal Precision"/>
+  <meta property="og:description" content="Responsive, high-performance websites with clean code and modern UI, crafted by SRT ROYAL Design."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="Logo_Image.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="auth-page">
+<!-- Scroll progress indicator -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Simple top bar so the login page doesn't feel stranded from the main site -->
+  <div class="auth-topbar">
+    <a href="index.html" class="auth-topbar__logo">
+      <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+      <span>SRT <span class="logo-accent">Royal</span></span>
+    </a>
+    <a href="index.html" class="auth-topbar__back">← Back to site</a>
+  </div>
+
+  <main id="main">
+
+    <!-- Auth Section Start -->
+    <section class="auth">
+      <div class="parallax-cloud" data-speed="0.06" style="top:-12%; left:-10%;"><div class="parallax-cloud__inner parallax-cloud--gold parallax-cloud--lg"></div></div>
+      <div class="parallax-cloud" data-speed="0.10" style="bottom:-14%; right:-8%;"><div class="parallax-cloud__inner parallax-cloud--soft parallax-cloud--md"></div></div>
+      <div class="auth__inner">
+
+        <div class="auth-card reveal">
+          <div class="auth-card__header">
+            <h1>Welcome to SRT Royal Site</h1>
+            <p>Sign in to your dashboard, or create a free account.</p>
+          </div>
+
+          <div class="auth-tabs" role="tablist" aria-label="Sign in or sign up">
+            <button class="auth-tabs__btn" type="button" role="tab" data-mode="signin">Sign in</button>
+            <button class="auth-tabs__btn" type="button" role="tab" data-mode="signup">Create account</button>
+          </div>
+
+          <div class="oauth-row">
+            <a class="btn btn--outline oauth-btn" href="#">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#EA4335" d="M12 10.2v3.9h5.5c-.24 1.4-1.7 4.2-5.5 4.2-3.3 0-6-2.7-6-6.1s2.7-6.1 6-6.1c1.9 0 3.2.8 3.9 1.5l2.7-2.6C16.9 3.4 14.7 2.4 12 2.4 6.9 2.4 2.7 6.6 2.7 11.7s4.2 9.3 9.3 9.3c5.4 0 9-3.8 9-9.1 0-.6-.07-1.1-.15-1.6H12z"/></svg>
+              <span>Continue with Google</span>
+            </a>
+            <a class="btn btn--outline oauth-btn" href="#">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.36 1.09 2.93.83.09-.65.35-1.09.63-1.34-2.22-.25-4.56-1.11-4.56-4.93 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.4 9.4 0 0 1 5 0c1.91-1.3 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.83-2.34 4.68-4.57 4.92.36.32.68.94.68 1.9v2.82c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg>
+              <span>Continue with GitHub</span>
+            </a>
+          </div>
+
+          <div class="auth-divider">or</div>
+
+          <!-- Sign in panel -->
+          <form class="form-panel" data-panel="signin">
+            <div class="form-field">
+              <label for="signinEmail">Email address</label>
+              <input class="form-input" type="email" id="signinEmail" placeholder="you@company.com" required />
+            </div>
+            <div class="form-field">
+              <label for="signinPassword">Password</label>
+              <input class="form-input" type="password" id="signinPassword" required />
+            </div>
+            <div class="form-row">
+              <label class="form-check">
+                <input type="checkbox" />
+                Remember me
+              </label>
+              <a class="form-link" href="#">Forgot password?</a>
+            </div>
+            <button class="btn btn--primary auth-card__submit" type="submit"><span>Sign in</span></button>
+            <p class="form-error hidden"></p>
+            <p class="form-success hidden"></p>
+          </form>
+
+          <!-- Sign up panel -->
+          <form class="form-panel" data-panel="signup">
+            <div class="form-field">
+              <label for="signupName">Full name</label>
+              <input class="form-input" type="text" id="signupName" placeholder="YOUR NAME" required />
+            </div>
+            <div class="form-field">
+              <label for="signupEmail">Email address</label>
+              <input class="form-input" type="email" id="signupEmail" placeholder="you@company.com" required />
+            </div>
+            <div class="form-field">
+              <label for="signupPassword">Password</label>
+              <input class="form-input" type="password" id="signupPassword" placeholder="At least 8 characters" required />
+            </div>
+            <button class="btn btn--primary auth-card__submit" type="submit"><span>Create free account</span></button>
+            <p class="form-error hidden"></p>
+            <p class="form-success hidden"></p>
+          </form>
+
+          <p class="auth-card__footnote">By continuing you agree to SRT Royal's <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
+        </div>
+
+      </div>
+    </section>
+    <!-- Auth Section End -->
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer" id="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-brand-col">
+          <a class="footer-logo" href="#home">
+            <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+            <span>SRT <span class="logo-accent">Royal</span></span>
+          </a>
+          <p class="footer-tagline">Connecting businesses with elite frontend designers who build websites that work — and look incredible doing it.</p>
+          <div class="footer-socials">
+            <a href="https://github.com/tawsifgaming373-bot" target="_blank" class="social-link" aria-label="GitHub">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.415-4.033-1.415-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://wa.me/8801976365076" target="_blank" class="social-link" aria-label="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.198.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .102 5.36.1 11.943c0 2.104.548 4.158 1.588 5.967L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.005c6.581 0 11.943-5.36 11.946-11.944a11.86 11.86 0 0 0-3.476-8.402"/></svg>
+            </a>
+            <a href="mailto:tawsifgaming373@gmail.com" class="social-link" aria-label="Email">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#designers">Browse Designers</a></li>
+            <li><a href="#hire">Submit a Request</a></li>
+            <li><a href="#testimonials">Client Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#home">About SRT Royal</a></li>
+            <li><a href="https://github.com/tawsifgaming373-bot/SRT-Royal-Site" target="_blank">GitHub</a></li>
+            <li><a href="#auth-section">Client Portal</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="mailto:tawsifgaming373@gmail.com">tawsifgaming373@gmail.com</a></li>
+            <li><a href="https://wa.me/8801976365076" target="_blank">+880 1976-365076</a></li>
+            <li><span style="color:var(--text-muted)">Bangladesh 🇧🇩</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <span>© 2025 SRT Royal. All rights reserved.</span>
+        <span>Design by SR.Tawsif</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WhatsApp FAB -->
+  <a class="whatsapp-fab" href="https://wa.me/8801976365076" target="_blank" aria-label="WhatsApp">
+    <span class="whatsapp-fab-ring"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.198.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .102 5.36.1 11.943c0 2.104.548 4.158 1.588 5.967L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.005c6.581 0 11.943-5.36 11.946-11.944a11.86 11.86 0 0 0-3.476-8.402"/></svg>
+  </a>
+
+  <script src="app.js"></script>
+</body>
+</html>
+
