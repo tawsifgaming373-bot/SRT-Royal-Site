@@ -4,6 +4,7 @@ const Designer = require('../models/Designer');
 const HireRequest = require('../models/HireRequest');
 const Review = require('../models/Review');
 const Project = require('../models/Project');
+const ContactMessage = require('../models/ContactMessage');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { requireObjectId, requireString } = require('../middleware/validation');
 
@@ -59,6 +60,15 @@ router.patch('/users/:id/status', async (req, res, next) => {
     await user.save();
     return res.json({ user: { id: user.id, email: user.email, role: user.role, isActive: user.isActive } });
   } catch (error) { return next(error); }
+});
+
+router.get('/contact-messages', async (req, res, next) => {
+  try {
+    const messages = await ContactMessage.find().sort({ createdAt: -1 }).limit(100).lean();
+    return res.json({ messages });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 router.get('/hire-requests', async (req, res, next) => {

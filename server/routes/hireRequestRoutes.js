@@ -2,9 +2,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const HireRequest = require('../models/HireRequest');
 const Designer = require('../models/Designer');
-const { requireAuth } = require('../middleware/auth');
-const { requireObjectId, requireString, pagination } = require('../middleware/validation');
+const { requireAuth, optionalAuth } = require('../middleware/auth');
+const { requireObjectId, requireString, isValidEmail, pagination } = require('../middleware/validation');
 const { createNotification } = require('../services/notificationService');
+const { sendEmail } = require('../services/emailService');
 const Project = require('../models/Project');
 
 const router = express.Router();
@@ -28,34 +29,71 @@ router.get('/', requireAuth, async (req, res, next) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res, next) => {
+router.post('/', optionalAuth, async (req, res, next) => {
   try {
-    const { designerId, projectTitle, description, budget, deadline } = req.body;
+    const { designerId, projectTitle, description, budget, budgetLabel, deadline, timeline, designStyle, name, email, whatsapp } = req.body;
 
-    if (!designerId || !projectTitle || !description) {
-      return res.status(400).json({ message: 'Designer, project title, and description are required.' });
+    if (!projectTitle || !description) {
+      return res.status(400).json({ message: 'Project title and description are required.' });
     }
 
-    if (!mongoose.Types.ObjectId.isValid(designerId)) {
-      return res.status(400).json({ message: 'Designer not found.' });
+    // Guests (not signed in) must leave contact details so the studio can reply.
+    let guestName = '', guestEmail = '', guestWhatsapp = '';
+    if (!req.user) {
+      if (!name || !email || !isValidEmail(email)) {
+        return res.status(400).json({ message: 'Your name and a valid email are required.' });
+      }
+      guestName = String(name).trim().slice(0, 120);
+      guestEmail = String(email).trim().toLowerCase();
+      guestWhatsapp = whatsapp ? String(whatsapp).trim().slice(0, 40) : '';
     }
 
-    const designer = await Designer.findById(designerId);
+    let designer = null;
+    if (designerId && mongoose.Types.ObjectId.isValid(designerId)) {
+      designer = await Designer.findById(designerId);
+    }
     if (!designer) {
-      return res.status(400).json({ message: 'Designer not found.' });
+      // No specific designer chosen (or not found): auto-assign the top-rated one.
+      designer = await Designer.findOne().sort({ rating: -1, createdAt: -1 });
     }
 
     const request = await HireRequest.create({
-      client: req.user.id,
-      designer: designer._id,
+      client: req.user ? req.user.id : null,
+      designer: designer ? designer._id : null,
+      guestName,
+      guestEmail,
+      guestWhatsapp,
       projectTitle: String(projectTitle).trim(),
       description: String(description).trim(),
-      budget: Number(budget) || 0,
-      deadline: deadline || '',
+      budget: Number(String(budget).replace(/[^0-9.]/g, '')) || 0,
+      budgetLabel: budgetLabel ? String(budgetLabel).trim().slice(0, 60) : (budget ? String(budget).slice(0, 60) : ''),
+      timeline: timeline ? String(timeline).trim().slice(0, 60) : '',
+      designStyle: designStyle ? String(designStyle).trim().slice(0, 60) : '',
+      deadline: deadline || timeline || '',
     });
-    await createNotification({ user: designer.user, type: 'hire_request', message: `New hire request: ${request.projectTitle}.`, metadata: { hireRequestId: request.id } });
 
-    return res.status(201).json({ hireRequest: request });
+    if (designer) {
+      await createNotification({ user: designer.user, type: 'hire_request', message: `New hire request: ${request.projectTitle}.`, metadata: { hireRequestId: request.id } });
+    }
+
+    // Best-effort email to the site owner; never fails the request.
+    if (process.env.OWNER_EMAIL) {
+      const contactLine = req.user
+        ? `Registered client (account email via dashboard)`
+        : `${guestName} — ${guestEmail}${guestWhatsapp ? ` (WhatsApp: ${guestWhatsapp})` : ''}`;
+      try {
+        await sendEmail({
+          to: process.env.OWNER_EMAIL,
+          subject: `New hire request: ${request.projectTitle}`,
+          text: `New hire request received.\n\nProject: ${request.projectTitle}\nBudget: ${request.budgetLabel || '—'}\nTimeline: ${request.timeline || '—'}\nStyle: ${request.designStyle || '—'}\nDesigner: ${designer ? 'assigned automatically/specific' : 'none available yet'}\nContact: ${contactLine}\n\nDescription:\n${request.description}`,
+          html: `<h3>New hire request</h3><p><b>Project:</b> ${request.projectTitle}<br/><b>Budget:</b> ${request.budgetLabel || '—'}<br/><b>Timeline:</b> ${request.timeline || '—'}<br/><b>Contact:</b> ${contactLine}</p><p>${request.description}</p>`,
+        });
+      } catch (emailError) {
+        console.error('Owner notification email failed:', emailError.message);
+      }
+    }
+
+    return res.status(201).json({ hireRequest: request, message: 'Request received! We will be in touch within 24 hours.' });
   } catch (error) {
     return next(error);
   }

@@ -194,21 +194,22 @@ hireForm?.addEventListener("submit", async (e) => {
     description:  $("#projectDesc")?.value.trim(),
     budget:       $("#projectBudget")?.value,
     timeline:     $("#projectTimeline")?.value,
-    designStyle:  $("#designStyle")?.value || "Not specified",
+    designStyle:  $("#designStyle")?.value || "",
     name:         $("#clientName")?.value.trim(),
     email:        $("#clientEmail")?.value.trim(),
-    whatsapp:     $("#clientWhatsapp")?.value.trim() || "Not provided",
-    designerId:   $("#designerId")?.value,
+    whatsapp:     $("#clientWhatsapp")?.value.trim() || "",
+    designerId:   $("#designerId")?.value || "",
   };
 
-  const required = ["projectTitle","description","budget","timeline","name","email","designerId"];
+  const token = getToken();
+  const required = ["projectTitle","description","timeline", ...(token ? [] : ["name","email"])];
   for (const k of required) {
     if (!data[k]) {
       showMsg(errorEl, "❌ Please fill in all required fields.", true);
       return;
     }
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+  if (!token && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
     showMsg(errorEl, "❌ Please enter a valid email address.", true);
     return;
   }
@@ -218,20 +219,33 @@ hireForm?.addEventListener("submit", async (e) => {
   btnLoad?.classList.remove("hidden");
 
   try {
-    if (!getToken()) throw new Error("Please sign in before submitting a hire request.");
     const res = await fetch(`${API_BASE}/api/hire-requests`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-      body: JSON.stringify({ designerId: data.designerId, projectTitle: data.projectTitle, description: data.description, budget: data.budget, deadline: data.timeline }),
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        designerId:   data.designerId,
+        projectTitle: data.projectTitle,
+        description:  data.description,
+        budgetLabel:  data.budget,
+        budget:       data.budget,
+        timeline:     data.timeline,
+        designStyle:  data.designStyle,
+        name:         data.name,
+        email:        data.email,
+        whatsapp:     data.whatsapp,
+      }),
     });
     const result = await safeJsonResponse(res);
     if (!res.ok) throw new Error(result.message || "Could not submit hire request.");
 
-    showMsg(successEl, "✅ Request received! We'll be in touch within 24 hours.");
+    showMsg(successEl, `✅ ${result.message || "Request received! We'll be in touch within 24 hours."}`);
     hireForm.reset();
   } catch (err) {
     console.error("Hire form error:", err);
-    showMsg(errorEl, "❌ Something went wrong. Please try WhatsApp instead.", true);
+    showMsg(errorEl, `❌ ${err.message}`, true);
   } finally {
     btn.disabled = false;
     btnText?.classList.remove("hidden");
@@ -336,6 +350,58 @@ authForms.forEach(function (form) {
   });
 });
 
+/* ─────────────────────────────────────────────
+   CONTACT PAGE FORM
+───────────────────────────────────────────── */
+const contactForm = $("#contactForm");
+contactForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const btn       = $("#contactSubmitBtn");
+  const btnText   = btn?.querySelector(".btn-text");
+  const btnLoad   = btn?.querySelector(".btn-loading");
+  const successEl = $("#contactSuccess");
+  const errorEl   = $("#contactError");
+  hideMsg(successEl); hideMsg(errorEl);
+
+  const payload = {
+    name:    $("#contactName")?.value.trim(),
+    email:   $("#contactEmail")?.value.trim(),
+    phone:   $("#contactPhone")?.value.trim() || "",
+    subject: $("#contactSubject")?.value.trim() || "",
+    message: $("#contactMessage")?.value.trim(),
+  };
+
+  if (!payload.name || !payload.email || !payload.message) {
+    showMsg(errorEl, "❌ Please fill in your name, email, and message.", true);
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
+    showMsg(errorEl, "❌ Please enter a valid email address.", true);
+    return;
+  }
+
+  btn.disabled = true;
+  btnText?.classList.add("hidden");
+  btnLoad?.classList.remove("hidden");
+  try {
+    const res = await fetch(`${API_BASE}/api/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await safeJsonResponse(res);
+    if (!res.ok) throw new Error(data.message || "Could not send your message.");
+    showMsg(successEl, `✅ ${data.message}`);
+    contactForm.reset();
+  } catch (err) {
+    showMsg(errorEl, `❌ ${err.message}`, true);
+  } finally {
+    btn.disabled = false;
+    btnText?.classList.remove("hidden");
+    btnLoad?.classList.add("hidden");
+  }
+});
+
 /* ─── OAuth buttons: redirect to the server's provider entry points ─── */
 document.querySelectorAll('.oauth-btn').forEach((btn) => {
   btn.addEventListener('click', async (e) => {
@@ -424,12 +490,19 @@ async function loadMarketplaceOptions() {
     try {
       const res = await fetch(`${API_BASE}/api/designers?limit=50`);
       const data = await safeJsonResponse(res);
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Any available designer (we'll match the best)";
+      designerSelect.appendChild(option);
       (data.designers || []).forEach((designer) => {
         const option = document.createElement("option");
         option.value = designer._id || designer.id;
         option.textContent = designer.user?.name || "Designer";
         designerSelect.appendChild(option);
       });
+      // Pre-select a designer when arriving via hire.html?designer=ID
+      const preselect = new URLSearchParams(window.location.search).get("designer");
+      if (preselect) designerSelect.value = preselect;
     } catch (_) {}
   }
 
@@ -448,7 +521,7 @@ async function loadMarketplaceOptions() {
         <div class="designer-card-top"><div class="designer-avatar-wrap">${photo ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" class="designer-avatar">` : `<div class="designer-avatar profile-avatar">${escapeHtml(name.charAt(0))}</div>`}</div>
         <div class="designer-info"><h3 class="designer-name">${escapeHtml(name)}</h3><p class="designer-title">${escapeHtml(designer.availability || "Available")}</p><div class="designer-rating"><span class="stars">★★★★★</span><span class="rating-val">${Number(designer.rating || 0).toFixed(1)}</span><span class="rating-count">(${designer.ratingCount || 0} reviews)</span></div></div></div>
         <div class="designer-skills">${(designer.skills || []).slice(0, 5).map((skill) => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")}</div>
-        <div class="designer-footer"><div class="designer-meta"><span>${escapeHtml(`${designer.experience || 0}+ yrs exp`)}</span></div><div class="designer-actions"><a href="mailto:${escapeHtml(email)}" class="btn btn-outline btn-sm" title="Email ${escapeHtml(name)}">📧 Email</a><a href="#hire" class="btn btn-gold btn-sm" data-designer-id="${escapeHtml(designer._id || designer.id)}">Hire Now</a></div></div>
+        <div class="designer-footer"><div class="designer-meta"><span>${escapeHtml(`${designer.experience || 0}+ yrs exp`)}</span></div><div class="designer-actions"><a href="mailto:${escapeHtml(email)}" class="btn btn-outline btn-sm" title="Email ${escapeHtml(name)}">📧 Email</a><a href="hire.html?designer=${escapeHtml(designer._id || designer.id)}" class="btn btn-gold btn-sm">Hire Now</a></div></div>
       </article>`;
     }).join("");
     designerGrid.querySelectorAll("[data-designer-id]").forEach((link) => link.addEventListener("click", () => {
@@ -814,8 +887,8 @@ async function renderCEOProfile(user) {
           <tbody>${requests.map(r => `
             <tr id="req-row-${r.id}">
               <td>${escapeHtml(r.projectTitle || "—")}</td>
-              <td>${escapeHtml(r.name || "—")}</td>
-              <td>${escapeHtml(r.budget || "—")}</td>
+              <td>${escapeHtml(r.guestName || r.client?.name || r.name || "Guest")}</td>
+              <td>${escapeHtml(r.budgetLabel || r.budget || "—")}</td>
               <td id="req-status-${r.id}">${statusBadge(r.status)}</td>
               <td>
                 <!-- Feature 6: CEO status dropdown -->
@@ -970,7 +1043,7 @@ $("#submitReviewBtn")?.addEventListener("click", async () => {
     $("#rName").value = ""; $("#rRole").value = ""; $("#rText").value = "";
   } catch (err) {
     console.error(err);
-    alert("Could not submit review. Please try again.");
+    alert(`Could not submit review: ${err.message || "please try again."}`);
   } finally {
     btn.disabled = false; btn.textContent = original;
   }

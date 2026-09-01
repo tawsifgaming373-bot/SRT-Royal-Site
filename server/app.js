@@ -18,6 +18,7 @@ const { validateEnvironment } = require('./config/env');
 const notificationRoutes = require('./routes/notificationRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 async function createApp() {
   validateEnvironment();
@@ -64,6 +65,7 @@ async function createApp() {
   app.use('/api/notifications', notificationRoutes);
   app.use('/api/projects', projectRoutes);
   app.use('/api/payments', paymentRoutes);
+  app.use('/api/contact', contactRoutes);
 
   app.get('/api/health', (req, res) => {
     const databaseReady = mongoose.connection.readyState === 1;
@@ -75,6 +77,7 @@ async function createApp() {
         googleOAuth: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
         githubOAuth: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
         passwordResetEmail: !!(process.env.RESEND_API_KEY && process.env.EMAIL_FROM),
+        ownerNotifications: !!process.env.OWNER_EMAIL,
       },
       timestamp: new Date().toISOString(),
     });

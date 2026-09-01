@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Designers — SRT Royal Design</title>
+  <meta name="description" content="Explore SRT Royal's curated roster of elite frontend designers and see how hiring works — three simple steps."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a class="nav-logo" href="index.html">
+        <img src="Logo_Image.png" alt="SRT ROYAL Design" class="nav-logo-img" onerror="this.style.display='none'"/>
+        <span class="logo-text">SRT <span class="logo-accent">Royal</span> Design</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="designers.html" class="nav-link active">Designers</a></li>
+        <li><a href="hire.html" class="nav-link">Hire</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="Login_page.html" class="nav-link" id="navAuthLink">Login</a></li>
+        <li><a href="index.html#profile-section" class="nav-link nav-login-link hidden" id="navProfileLink">My Account</a></li>
+        <li><a href="hire.html" class="btn btn-gold nav-cta">Let's Work Together</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════ HOW IT WORKS ══════════════ -->
+  <section class="section hiw-section" id="how-it-works" style="padding-top:130px;">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Simple Process</span>
+        <h2 class="section-title">How It <span class="text-gold">Works</span></h2>
+        <p class="section-desc">From idea to live website in three simple steps</p>
+      </div>
+      <div class="hiw-grid">
+        <div class="hiw-card reveal">
+          <div class="hiw-icon-wrap">
+            <div class="hiw-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            </div>
+            <span class="hiw-step-num">01</span>
+          </div>
+          <h3>Browse Designers</h3>
+          <p>Explore our curated roster of elite frontend designers. Review portfolios, skills, and past work to find your perfect match.</p>
+        </div>
+        <div class="hiw-connector reveal"></div>
+        <div class="hiw-card reveal">
+          <div class="hiw-icon-wrap">
+            <div class="hiw-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <span class="hiw-step-num">02</span>
+          </div>
+          <h3>Submit Your Brief</h3>
+          <p>Fill out our detailed hire request form with your project scope, budget, timeline, and design preferences — no account needed.</p>
+        </div>
+        <div class="hiw-connector reveal"></div>
+        <div class="hiw-card reveal">
+          <div class="hiw-icon-wrap">
+            <div class="hiw-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </div>
+            <span class="hiw-step-num">03</span>
+          </div>
+          <h3>Get Connected</h3>
+          <p>We match you with the best designer for your needs. Expect a response within 24 hours to kick off your project.</p>
+        </div>
+      </div>
+      <div class="hero-actions" style="justify-content:center;margin-top:48px;">
+        <a href="hire.html" class="btn btn-gold btn-lg">
+          <span>Submit a Hire Request</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FEATURED DESIGNERS ══════════════ -->
+  <section class="section designers-section" id="designers">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Our Talent</span>
+        <h2 class="section-title">Featured <span class="text-gold">Designers</span></h2>
+        <p class="section-desc">Handpicked professionals ready to bring your vision to life</p>
+      </div>
+      <div class="designers-grid">
+
+        <div class="designer-card reveal">
+          <div class="designer-card-top">
+            <div class="designer-avatar-wrap">
+              <img src="T.jpg" alt="Sr. Tawsif" class="designer-avatar" onerror="this.src='https://ui-avatars.com/api/?name=Tawsif&background=FFD700&color=0A0F1E&size=80'"/>
+              <span class="designer-available-dot"></span>
+            </div>
+            <div class="designer-info">
+              <h3 class="designer-name">Sr. Tawsif</h3>
+              <p class="designer-title">Lead Frontend Designer</p>
+              <div class="designer-rating">
+                <span class="stars">★★★★★</span>
+                <span class="rating-val">5.0</span>
+                <span class="rating-count">(24 reviews)</span>
+              </div>
+            </div>
+            <span class="designer-badge badge-top">⚡ Top Pick</span>
+          </div>
+          <div class="designer-skills">
+            <span class="skill-tag">HTML/CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">UI Design</span>
+            <span class="skill-tag">Responsive</span>
+          </div>
+          <div class="designer-footer">
+            <div class="designer-meta">
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                Bangladesh
+              </span>
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+                2+ yrs exp
+              </span>
+            </div>
+            <a href="hire.html" class="btn btn-gold btn-sm">Hire Now</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer" id="footer">
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-brand-col">
+          <a class="footer-logo" href="index.html">
+            <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+            <span>SRT <span class="logo-accent">Royal</span></span>
+          </a>
+          <p class="footer-tagline">Connecting businesses with elite frontend designers who build websites that work — and look incredible doing it.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="designers.html#how-it-works">How It Works</a></li>
+            <li><a href="designers.html">Browse Designers</a></li>
+            <li><a href="hire.html">Submit a Request</a></li>
+            <li><a href="index.html#testimonials">Client Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="index.html#about">About SRT Royal</a></li>
+            <li><a href="https://github.com/tawsifgaming373-bot/SRT-Royal-Site" target="_blank">GitHub</a></li>
+            <li><a href="Login_page.html">Client Portal</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="contact.html">Contact Form</a></li>
+            <li><a href="mailto:tawsifgaming373@gmail.com">tawsifgaming373@gmail.com</a></li>
+            <li><a href="https://wa.me/8801976365076" target="_blank">+880 1976-365076</a></li>
+            <li><span style="color:var(--text-muted)">Bangladesh 🇧🇩</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <span>© 2025 SRT Royal. All rights reserved.</span>
+        <span>Design by SR.Tawsif</span>
+      </div>
+    </div>
+  </footer>
+
+  <a class="whatsapp-fab" href="https://wa.me/8801976365076" target="_blank" aria-label="WhatsApp">
+    <span class="whatsapp-fab-ring"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.198.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .102 5.36.1 11.943c0 2.104.548 4.158 1.588 5.967L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.005c6.581 0 11.943-5.36 11.946-11.944a11.86 11.86 0 0 0-3.476-8.402"/></svg>
+  </a>
+
+  <script src="app.js"></script>
+</body>
+</html>
