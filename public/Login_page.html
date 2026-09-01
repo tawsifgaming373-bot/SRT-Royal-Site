@@ -74,9 +74,21 @@
                 <input type="checkbox" />
                 Remember me
               </label>
-              <a class="form-link" href="#">Forgot password?</a>
+              <a class="form-link" href="#forgot">Forgot password?</a>
             </div>
             <button class="btn btn--primary auth-card__submit" type="submit"><span>Sign in</span></button>
+            <p class="form-error hidden"></p>
+            <p class="form-success hidden"></p>
+          </form>
+
+          <!-- Forgot password panel -->
+          <form class="form-panel" data-panel="forgot">
+            <p>Enter your account email and we will send you a reset link.</p>
+            <div class="form-field">
+              <label for="forgotEmail">Email address</label>
+              <input class="form-input" type="email" id="forgotEmail" placeholder="you@company.com" required />
+            </div>
+            <button class="btn btn--primary auth-card__submit" type="submit"><span>Send reset link</span></button>
             <p class="form-error hidden"></p>
             <p class="form-success hidden"></p>
           </form>

@@ -42,6 +42,19 @@ const userSchema = new mongoose.Schema({
     location: { type: String, default: '' },
     website: { type: String, default: '' },
   },
+  provider: {
+    type: String,
+    enum: ['local', 'google', 'github'],
+    default: 'local',
+  },
+  resetTokenHash: {
+    type: String,
+    default: '',
+  },
+  resetTokenExpires: {
+    type: Date,
+    default: null,
+  },
   isActive: {
     type: Boolean,
     default: true,

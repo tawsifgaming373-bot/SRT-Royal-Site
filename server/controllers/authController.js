@@ -1,7 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/User');
 const { isValidEmail, requireString } = require('../middleware/validation');
+const { sendEmail } = require('../services/emailService');
 
 function sanitizeUser(user) {
   const doc = user.toObject ? user.toObject() : user;
@@ -85,4 +87,80 @@ async function login(req, res, next) {
   }
 }
 
-module.exports = { signup, login, sanitizeUser, signToken };
+function hashResetToken(token) {
+  return crypto.createHash('sha256').update(String(token)).digest('hex');
+}
+
+async function forgotPassword(req, res, next) {
+  try {
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: 'A valid email address is required.' });
+    }
+
+    const genericMessage = 'If that email is registered, a password reset link has been sent.';
+    const user = await User.findOne({ email });
+    if (!user || !user.isActive) {
+      return res.json({ message: genericMessage });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    user.resetTokenHash = hashResetToken(token);
+    user.resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    const base = process.env.CLIENT_URL || `${req.protocol}://${req.get('host')}`;
+    const resetUrl = `${base}/reset-password.html?token=${token}`;
+
+    let delivery = { sent: false };
+    try {
+      delivery = await sendEmail({
+        to: user.email,
+        subject: 'SRT Royal — Reset your password',
+        text: `You requested a password reset. Open this link within 1 hour: ${resetUrl}`,
+        html: `<p>You requested a password reset for your SRT Royal account.</p><p><a href="${resetUrl}">Reset your password</a> — the link is valid for 1 hour.</p><p>If you did not request this, you can safely ignore this email.</p>`,
+      });
+    } catch (emailError) {
+      return res.json({ message: `${genericMessage} The email could not be delivered right now — please try again later.` });
+    }
+
+    if (!delivery.sent && process.env.NODE_ENV !== 'production') {
+      return res.json({ message: `${genericMessage} (dev only — email provider not configured, reset link: ${resetUrl})`, devResetUrl: resetUrl });
+    }
+
+    return res.json({ message: genericMessage });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function resetPassword(req, res, next) {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ message: 'Reset token is required.' });
+    }
+    if (typeof newPassword !== 'string' || newPassword.length < 8) {
+      return res.status(400).json({ message: 'New password must be at least 8 characters long.' });
+    }
+
+    const user = await User.findOne({
+      resetTokenHash: hashResetToken(token),
+      resetTokenExpires: { $gt: new Date() },
+    });
+    if (!user) {
+      return res.status(400).json({ message: 'This reset link is invalid or has expired.' });
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 12);
+    user.resetTokenHash = '';
+    user.resetTokenExpires = null;
+    await user.save();
+
+    return res.json({ message: 'Password updated. You can now sign in with your new password.' });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+module.exports = { signup, login, forgotPassword, resetPassword, sanitizeUser, signToken };

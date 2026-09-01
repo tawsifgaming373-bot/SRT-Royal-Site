@@ -17,11 +17,39 @@ const API_BASE = "";
 const TOKEN_KEY = "srt_token";
 const USER_KEY  = "srt_user";
 
-const getToken = () => localStorage.getItem(TOKEN_KEY);
-const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
-const clearAuth = () => { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); };
-const getUser = () => { try { return JSON.parse(localStorage.getItem(USER_KEY) || "null"); } catch { return null; } };
-const setUser = (u) => localStorage.setItem(USER_KEY, JSON.stringify(u));
+/* "Remember me": checked → localStorage (survives closing the browser);
+   unchecked → sessionStorage (cleared when the browser closes). */
+function authStore() {
+  return sessionStorage.getItem(TOKEN_KEY) ? sessionStorage : localStorage;
+}
+const getToken = () => localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+const getUser = () => { try { return JSON.parse(authStore().getItem(USER_KEY) || "null"); } catch { return null; } };
+const setUser = (u) => { try { authStore().setItem(USER_KEY, JSON.stringify(u)); } catch (_) {} };
+function setAuth(token, user, remember = true) {
+  const store = remember ? localStorage : sessionStorage;
+  [TOKEN_KEY, USER_KEY].forEach((key) => { localStorage.removeItem(key); sessionStorage.removeItem(key); });
+  store.setItem(TOKEN_KEY, token);
+  store.setItem(USER_KEY, JSON.stringify(user));
+}
+const clearAuth = () => { [TOKEN_KEY, USER_KEY].forEach((key) => { localStorage.removeItem(key); sessionStorage.removeItem(key); }); };
+
+/* ─── OAuth: the server redirects back here with #token=... ─── */
+if (window.location.hash.startsWith("#token=")) {
+  (async () => {
+    const token = decodeURIComponent(window.location.hash.slice(7));
+    clearAuth();
+    history.replaceState(null, "", window.location.pathname);
+    try {
+      const res = await fetch(`${API_BASE}/api/users/me`, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error("token rejected");
+      const data = await safeJsonResponse(res);
+      setAuth(token, data.user, true);
+      window.location.replace("index.html#profile-section");
+    } catch (_) {
+      showMsg(document.querySelector(".form-error"), "❌ Social sign-in failed. Please try again.", true);
+    }
+  })();
+}
 
 function showMsg(el, msg, isError = false) {
   if (!el) return;
@@ -246,6 +274,7 @@ authForms.forEach(function (form) {
     e.preventDefault();
 
     const mode      = form.dataset.panel; // "signin" | "signup"
+    const remember  = form.querySelector('.form-check input')?.checked ?? true;
     const submitBtn = form.querySelector('.auth-card__submit');
     const errorEl   = form.querySelector('.form-error');
     const successEl = form.querySelector('.form-success');
@@ -293,8 +322,7 @@ authForms.forEach(function (form) {
       const data = await safeJsonResponse(res);
       if (!res.ok) throw new Error(data.message || 'Something went wrong. Please try again.');
 
-      setToken(data.token);
-      setUser(data.user);
+      setAuth(data.token, data.user, remember);
       showMsg(successEl, mode === 'signup' ? '✅ Account created! Redirecting…' : '✅ Signed in! Redirecting…');
       setTimeout(() => { window.location.href = 'index.html#profile-section'; }, 600);
     } catch (err) {
@@ -308,12 +336,56 @@ authForms.forEach(function (form) {
   });
 });
 
-/* ─── OAuth buttons: not wired to a real provider yet ─── */
+/* ─── OAuth buttons: redirect to the server's provider entry points ─── */
 document.querySelectorAll('.oauth-btn').forEach((btn) => {
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener('click', async (e) => {
     e.preventDefault();
-    alert('Social sign-in is coming soon — please continue with email for now.');
+    const provider = btn.textContent.toLowerCase().includes("google") ? "google" : "github";
+    const label = provider === "google" ? "Google" : "GitHub";
+    try {
+      const res  = await fetch(`${API_BASE}/api/health`);
+      const data = await safeJsonResponse(res);
+      if (!data.features?.[`${provider}OAuth`]) {
+        alert(`${label} sign-in is not configured on this server yet. ${label} OAuth credentials must be added to the environment first.`);
+        return;
+      }
+      window.location.href = `${API_BASE}/api/auth/${provider}`;
+    } catch (_) {
+      alert("Could not reach the server. Please try again.");
+    }
   });
+});
+
+/* ─── Forgot password ─── */
+var forgotLink = document.querySelector('.form-link[href="#forgot"]');
+if (forgotLink) {
+  forgotLink.addEventListener('click', (e) => { e.preventDefault(); setAuthMode('forgot'); });
+}
+
+var forgotForm = document.querySelector('.form-panel[data-panel="forgot"]');
+forgotForm?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email     = $('#forgotEmail')?.value.trim();
+  const errorEl   = forgotForm.querySelector('.form-error');
+  const successEl = forgotForm.querySelector('.form-success');
+  const submitBtn = forgotForm.querySelector('.auth-card__submit');
+  hideMsg(errorEl); hideMsg(successEl);
+  if (!email) { showMsg(errorEl, '❌ Please enter your email address.', true); return; }
+  if (submitBtn) submitBtn.disabled = true;
+  try {
+    const res  = await fetch(`${API_BASE}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await safeJsonResponse(res);
+    if (!res.ok) throw new Error(data.message || 'Could not send the reset email.');
+    showMsg(successEl, `✅ ${data.message}`);
+  } catch (err) {
+    showMsg(errorEl, `❌ ${err.message}`, true);
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
 });
 
 /* ─────────────────────────────────────────────

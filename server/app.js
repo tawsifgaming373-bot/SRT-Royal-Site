@@ -28,6 +28,7 @@ async function createApp() {
   }
 
   const app = express();
+  app.set('trust proxy', 1);
 
   app.use(helmet({
     crossOriginResourcePolicy: false,
@@ -70,6 +71,11 @@ async function createApp() {
       status: databaseReady || !process.env.MONGODB_URI ? 'healthy' : 'degraded',
       database: databaseReady ? 'connected' : 'not-connected',
       env: process.env.NODE_ENV || 'development',
+      features: {
+        googleOAuth: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+        githubOAuth: !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET),
+        passwordResetEmail: !!(process.env.RESEND_API_KEY && process.env.EMAIL_FROM),
+      },
       timestamp: new Date().toISOString(),
     });
   });
