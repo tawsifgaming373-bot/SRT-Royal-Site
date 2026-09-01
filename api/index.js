@@ -10,6 +10,7 @@ const mime = {
 };
 
 let appPromise;
+let appError = null;
 
 module.exports = async function vercelHandler(req, res) {
   if (!req.url.startsWith('/api')) {
@@ -28,7 +29,27 @@ module.exports = async function vercelHandler(req, res) {
     return res.end(fs.readFileSync(indexPath));
   }
 
-  if (!appPromise) appPromise = createApp();
-  const app = await appPromise;
-  return app(req, res);
+  if (appError) {
+    res.statusCode = 503;
+    res.setHeader('Content-Type', 'application/json');
+    return res.end(JSON.stringify({ message: appError }));
+  }
+
+  if (!appPromise) {
+    appPromise = createApp().catch((error) => {
+      appError = error.message || 'Server initialization failed';
+      throw error;
+    });
+  }
+
+  try {
+    const app = await appPromise;
+    return app(req, res);
+  } catch (error) {
+    if (!res.headersSent) {
+      res.statusCode = 503;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ message: appError || error.message || 'Server error' }));
+    }
+  }
 };

@@ -38,6 +38,15 @@ function escapeHtml(str = "") {
   }[c]));
 }
 
+/* ─── Safe fetch helper ─── */
+async function safeJsonResponse(res) {
+  try {
+    return await res.json();
+  } catch (e) {
+    throw new Error(`Server error: ${res.status} ${res.statusText}. Backend is not available.`);
+  }
+}
+
 /* ─── Status badge helper ─── */
 function statusBadge(status) {
   const map = {
@@ -182,7 +191,7 @@ hireForm?.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ designerId: data.designerId, projectTitle: data.projectTitle, description: data.description, budget: data.budget, deadline: data.timeline }),
     });
-    const result = await res.json();
+    const result = await safeJsonResponse(res);
     if (!res.ok) throw new Error(result.message || "Could not submit hire request.");
 
     showMsg(successEl, "✅ Request received! We'll be in touch within 24 hours.");
@@ -276,7 +285,7 @@ authForms.forEach(function (form) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await res.json();
+      const data = await safeJsonResponse(res);
       if (!res.ok) throw new Error(data.message || 'Something went wrong. Please try again.');
 
       setToken(data.token);
@@ -314,14 +323,14 @@ async function loadFullProfile() {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) return;
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     if (data.user) setUser(data.user);
     // Save hire requests in memory for rendering
     const requestsRes = await fetch(`${API_BASE}/api/hire-requests`, { headers: { Authorization: `Bearer ${token}` } });
-    const requestsData = await requestsRes.json();
+    const requestsData = await safeJsonResponse(requestsRes);
     window._srtHireRequests = requestsData.hireRequests || [];
     const projectsRes = await fetch(`${API_BASE}/api/projects`, { headers: { Authorization: `Bearer ${token}` } });
-    const projectsData = await projectsRes.json();
+    const projectsData = await safeJsonResponse(projectsRes);
     const projectSelect = $("#reviewProject");
     (projectsData.projects || []).filter((project) => project.status === "completed").forEach((project) => {
       const option = document.createElement("option");
@@ -337,7 +346,7 @@ async function loadMarketplaceOptions() {
   if (designerSelect) {
     try {
       const res = await fetch(`${API_BASE}/api/designers?limit=50`);
-      const data = await res.json();
+      const data = await safeJsonResponse(res);
       (data.designers || []).forEach((designer) => {
         const option = document.createElement("option");
         option.value = designer._id || designer.id;
@@ -351,7 +360,7 @@ async function loadMarketplaceOptions() {
   if (!designerGrid) return;
   try {
     const res = await fetch(`${API_BASE}/api/designers?limit=6`);
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     if (!res.ok || !Array.isArray(data.designers) || data.designers.length === 0) return;
     designerGrid.innerHTML = data.designers.map((designer) => {
       const user = designer.user || {};
@@ -411,7 +420,7 @@ async function saveProfileEdit(name, company, phone) {
       },
       body: JSON.stringify({ name, company, phone }),
     });
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     if (!res.ok) throw new Error(data.message || "Update failed");
     if (data.user) setUser(data.user);
     return true;
@@ -437,7 +446,7 @@ async function updateHireStatus(requestId, newStatus) {
       },
       body: JSON.stringify({ status: newStatus }),
     });
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     if (!res.ok) throw new Error(data.message || "Status update failed");
     return data.hireRequest;
   } catch (err) {
@@ -687,7 +696,7 @@ async function renderCEOProfile(user) {
     const res = await fetch(`${API_BASE}/api/admin/users`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     const clients = (data.users || []).filter((client) => client.role === "client");
 
     const clientsHtml = clients.length === 0
@@ -717,7 +726,7 @@ async function renderCEOProfile(user) {
     const res = await fetch(`${API_BASE}/api/admin/hire-requests`, {
       headers: { Authorization: `Bearer ${getToken()}` },
     });
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     const requests = data.hireRequests || [];
 
     const reqHtml = requests.length === 0
@@ -856,7 +865,7 @@ $("#submitReviewBtn")?.addEventListener("click", async () => {
         },
         body: JSON.stringify({ project: projectId, rating: selectedStars, comment: text }),
     });
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     if (!res.ok) throw new Error(data.message || "Could not submit review.");
 
     const list = $("#testimonialsList");
