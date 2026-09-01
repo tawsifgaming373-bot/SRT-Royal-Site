@@ -365,12 +365,13 @@ async function loadMarketplaceOptions() {
     designerGrid.innerHTML = data.designers.map((designer) => {
       const user = designer.user || {};
       const name = user.name || "Designer";
+      const email = user.email || "";
       const photo = user.photo || "";
       return `<article class="designer-card reveal visible">
         <div class="designer-card-top"><div class="designer-avatar-wrap">${photo ? `<img src="${escapeHtml(photo)}" alt="${escapeHtml(name)}" class="designer-avatar">` : `<div class="designer-avatar profile-avatar">${escapeHtml(name.charAt(0))}</div>`}</div>
         <div class="designer-info"><h3 class="designer-name">${escapeHtml(name)}</h3><p class="designer-title">${escapeHtml(designer.availability || "Available")}</p><div class="designer-rating"><span class="stars">★★★★★</span><span class="rating-val">${Number(designer.rating || 0).toFixed(1)}</span><span class="rating-count">(${designer.ratingCount || 0} reviews)</span></div></div></div>
         <div class="designer-skills">${(designer.skills || []).slice(0, 5).map((skill) => `<span class="skill-tag">${escapeHtml(skill)}</span>`).join("")}</div>
-        <div class="designer-footer"><div class="designer-meta"><span>${escapeHtml(`${designer.experience || 0}+ yrs exp`)}</span></div><a href="#hire" class="btn btn-gold btn-sm" data-designer-id="${escapeHtml(designer._id || designer.id)}">Hire Now</a></div>
+        <div class="designer-footer"><div class="designer-meta"><span>${escapeHtml(`${designer.experience || 0}+ yrs exp`)}</span></div><div class="designer-actions"><a href="mailto:${escapeHtml(email)}" class="btn btn-outline btn-sm" title="Email ${escapeHtml(name)}">📧 Email</a><a href="#hire" class="btn btn-gold btn-sm" data-designer-id="${escapeHtml(designer._id || designer.id)}">Hire Now</a></div></div>
       </article>`;
     }).join("");
     designerGrid.querySelectorAll("[data-designer-id]").forEach((link) => link.addEventListener("click", () => {
@@ -525,7 +526,7 @@ function renderClientProfile(user, hireRequests) {
       </div>
       <div>
         <h3 id="displayName">Welcome, ${escapeHtml(user.name || "Client")}</h3>
-        <p class="text-muted">${escapeHtml(user.email || "")}</p>
+        <p class="text-muted"><a href="mailto:${escapeHtml(user.email || "")}">${escapeHtml(user.email || "")}</a></p>
         ${user.company ? `<p class="text-muted" id="displayCompany">🏢 ${escapeHtml(user.company)}</p>` : ""}
         ${user.phone ? `<p class="text-muted" id="displayPhone">📞 ${escapeHtml(user.phone)}</p>` : ""}
         <!-- Feature 4 & 5: Client ID + Member Since -->
@@ -667,7 +668,7 @@ async function renderCEOProfile(user) {
       <div class="profile-avatar ceo-avatar">👑</div>
       <div>
         <h3>CEO Dashboard</h3>
-        <p class="text-muted">${escapeHtml(user.email)}</p>
+        <p class="text-muted"><a href="mailto:${escapeHtml(user.email)}">${escapeHtml(user.email)}</a></p>
         <p class="client-id-badge">🆔 ${escapeHtml(user.clientId || "SRT-CEO-0001")}</p>
       </div>
     </div>
@@ -706,7 +707,7 @@ async function renderCEOProfile(user) {
           <tbody>${clients.map(c => `
             <tr>
               <td>${escapeHtml(c.name)}</td>
-              <td>${escapeHtml(c.email)}</td>
+              <td><a href="mailto:${escapeHtml(c.email)}">${escapeHtml(c.email)}</a></td>
               <td><span class="client-id-badge">${escapeHtml(c.clientId)}</span></td>
               <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
               <td>${(c.requests || []).length}</td>
