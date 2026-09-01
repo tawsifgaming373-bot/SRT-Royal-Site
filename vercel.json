@@ -4,13 +4,6 @@
     { "src": "api/index.js", "use": "@vercel/node" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "src": "/app.js", "dest": "/public/app.js" },
-    { "src": "/style.css", "dest": "/public/style.css" },
-    { "src": "/styles.css", "dest": "/public/styles.css" },
-    { "src": "/Login_page.html", "dest": "/public/Login_page.html" },
-    { "src": "/Logo_Image.png", "dest": "/public/Logo_Image.png" },
-    { "src": "/T.jpg", "dest": "/public/T.jpg" },
-    { "src": "/(.*)", "dest": "/public/index.html" }
+    { "src": "/(.*)", "dest": "/api/index.js" }
   ]
 }
