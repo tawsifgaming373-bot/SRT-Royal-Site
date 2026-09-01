@@ -50,7 +50,12 @@ async function safeJsonResponse(res) {
 /* ─── Status badge helper ─── */
 function statusBadge(status) {
   const map = {
-    pending: { color: "#f59e0b", label: "⏳ Pending" },
+    pending:     { color: "#f59e0b", label: "⏳ Pending" },
+    accepted:    { color: "#3b82f6", label: "🔵 Accepted" },
+    in_progress: { color: "#3b82f6", label: "🔧 In Progress" },
+    completed:   { color: "#22c55e", label: "✅ Completed" },
+    rejected:    { color: "#ef4444", label: "❌ Rejected" },
+    cancelled:   { color: "#6b7280", label: "🚫 Cancelled" },
     active:  { color: "#3b82f6", label: "🔵 Active" },
     done:    { color: "#22c55e", label: "✅ Done" },
   };

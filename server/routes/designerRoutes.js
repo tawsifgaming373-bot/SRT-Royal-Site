@@ -2,7 +2,7 @@ const express = require('express');
 const Designer = require('../models/Designer');
 const User = require('../models/User');
 const { requireAuth } = require('../middleware/auth');
-const { pagination, requireObjectId, requireString } = require('../middleware/validation');
+const { pagination, requireObjectId, requireString, escapeRegex } = require('../middleware/validation');
 
 const router = express.Router();
 
@@ -13,10 +13,11 @@ router.get('/', async (req, res, next) => {
     const filter = {};
 
     if (search) {
+      const safeSearch = escapeRegex(String(search).slice(0, 100));
       filter.$or = [
-        { bio: { $regex: String(search), $options: 'i' } },
-        { skills: { $regex: String(search), $options: 'i' } },
-        { categories: { $regex: String(search), $options: 'i' } },
+        { bio: { $regex: safeSearch, $options: 'i' } },
+        { skills: { $regex: safeSearch, $options: 'i' } },
+        { categories: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 

@@ -5,7 +5,7 @@ const HireRequest = require('../models/HireRequest');
 const Review = require('../models/Review');
 const Project = require('../models/Project');
 const { requireAuth, requireRole } = require('../middleware/auth');
-const { requireObjectId } = require('../middleware/validation');
+const { requireObjectId, requireString } = require('../middleware/validation');
 
 const router = express.Router();
 
@@ -42,7 +42,7 @@ router.get('/overview', async (req, res, next) => {
 
 router.get('/users', async (req, res, next) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 }).lean();
+    const users = await User.find().select('-passwordHash -__v').sort({ createdAt: -1 }).lean();
     return res.json({ users });
   } catch (error) {
     return next(error);
@@ -72,10 +72,14 @@ router.get('/hire-requests', async (req, res, next) => {
 
 router.patch('/hire-requests/:id/status', async (req, res, next) => {
   try {
-    const request = await HireRequest.findById(req.params.id);
+    const request = await HireRequest.findById(requireObjectId(req.params.id, 'Hire request ID'));
     if (!request) return res.status(404).json({ message: 'Hire request not found.' });
 
-    if (req.body.status) request.status = req.body.status;
+    const nextStatus = requireString(req.body.status, 'Status', { max: 20 });
+    if (!['pending', 'accepted', 'rejected', 'in_progress', 'completed', 'cancelled'].includes(nextStatus)) {
+      return res.status(400).json({ message: 'Invalid hire request status.' });
+    }
+    request.status = nextStatus;
     await request.save();
     return res.json({ hireRequest: request });
   } catch (error) {

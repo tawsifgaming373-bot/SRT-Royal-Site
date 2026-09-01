@@ -12,9 +12,14 @@ const router = express.Router();
 router.get('/', requireAuth, async (req, res, next) => {
   try {
     const { page, limit, skip } = pagination(req.query);
-    const filter = req.user.role === 'admin' ? {} : { client: req.user.id };
+    const filter = {};
+    if (req.user.role !== 'admin') {
+      const designerProfile = await Designer.findOne({ user: req.user.id }).select('_id').lean();
+      filter.$or = [{ client: req.user.id }];
+      if (designerProfile) filter.$or.push({ designer: designerProfile._id });
+    }
     const [requests, total] = await Promise.all([
-      HireRequest.find(filter).populate('designer').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      HireRequest.find(filter).populate('client', 'name email company').populate('designer').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       HireRequest.countDocuments(filter),
     ]);
     return res.json({ hireRequests: requests, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
@@ -61,8 +66,11 @@ router.patch('/:id', requireAuth, async (req, res, next) => {
     const request = await HireRequest.findById(requireObjectId(req.params.id, 'Hire request ID'));
     if (!request) return res.status(404).json({ message: 'Hire request not found.' });
 
-    if (String(request.client) !== String(req.user.id) && req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'You can only update your own hire request.' });
+    const requestDesigner = await Designer.findById(request.designer).select('user');
+    const isClient = String(request.client) === String(req.user.id);
+    const isDesignerUser = !!requestDesigner && String(requestDesigner.user) === String(req.user.id);
+    if (req.user.role !== 'admin' && !isClient && !isDesignerUser) {
+      return res.status(403).json({ message: 'You cannot update this hire request.' });
     }
 
     const nextStatus = requireString(req.body.status, 'Status', { max: 20 });
@@ -71,17 +79,20 @@ router.patch('/:id', requireAuth, async (req, res, next) => {
       rejected: [], in_progress: ['completed', 'cancelled'], completed: [], cancelled: [],
     };
     if (!transitions[request.status]?.includes(nextStatus)) return res.status(400).json({ message: `Cannot change request from ${request.status} to ${nextStatus}.` });
-    const requestDesigner = await Designer.findById(request.designer).select('user');
-    const isOwner = String(request.client) === String(req.user.id) || (requestDesigner && String(requestDesigner.user) === String(req.user.id));
-    if (req.user.role !== 'admin' && !isOwner) return res.status(403).json({ message: 'You cannot update this request.' });
+    if (['accepted', 'rejected'].includes(nextStatus) && req.user.role !== 'admin' && !isDesignerUser) {
+      return res.status(403).json({ message: 'Only the designer can accept or reject this hire request.' });
+    }
     request.status = nextStatus;
     await request.save();
     if (nextStatus === 'accepted') {
       const project = await Project.create({ client: request.client, designer: request.designer, hireRequest: request._id, title: request.projectTitle, description: request.description, budget: request.budget, deadline: request.deadline });
-      await createNotification({ user: request.client, type: 'hire_accepted', message: `Your hire request was accepted. Project ${project.title} was created.`, metadata: { projectId: project.id } });
+      await createNotification({ user: request.client, type: 'hire_accepted', message: `Your hire request was accepted. Project ${project.title} was created.`, metadata: { hireRequestId: request.id } });
       return res.json({ hireRequest: request, project });
     }
-    await createNotification({ user: String(request.client) === String(req.user.id) ? request.designer : request.client, type: `hire_${nextStatus}`, message: `Hire request status changed to ${nextStatus}.`, metadata: { hireRequestId: request.id } });
+    const notifyUser = isClient ? requestDesigner?.user : request.client;
+    if (notifyUser) {
+      await createNotification({ user: notifyUser, type: `hire_${nextStatus}`, message: `Hire request status changed to ${nextStatus}.`, metadata: { hireRequestId: request.id } });
+    }
     return res.json({ hireRequest: request });
   } catch (error) {
     return next(error);

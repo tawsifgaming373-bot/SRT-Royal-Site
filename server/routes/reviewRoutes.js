@@ -35,11 +35,21 @@ router.post('/', requireAuth, async (req, res, next) => {
     const designer = await Designer.findById(projectRecord.designer);
     if (!designer) return res.status(404).json({ message: 'Designer not found.' });
 
+    const ratingValue = Number(rating);
+    if (!Number.isInteger(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+      return res.status(400).json({ message: 'Rating must be a whole number between 1 and 5.' });
+    }
+
+    const existingReview = await Review.findOne({ client: req.user.id, project: projectRecord._id });
+    if (existingReview) {
+      return res.status(400).json({ message: 'You have already reviewed this project.' });
+    }
+
     const review = await Review.create({
       client: req.user.id,
       designer: designer._id,
       project: projectRecord._id,
-      rating: Number(rating),
+      rating: ratingValue,
       comment: requireString(comment, 'Comment', { max: 2000 }),
     });
 
@@ -61,8 +71,20 @@ router.patch('/:id/moderate', requireAuth, requireRole('admin'), async (req, res
     if (!review) return res.status(404).json({ message: 'Review not found.' });
 
     if (!['pending', 'approved', 'rejected'].includes(req.body.status)) return res.status(400).json({ message: 'Invalid moderation status.' });
+    const previousStatus = review.moderationStatus;
     review.moderationStatus = req.body.status;
     await review.save();
+
+    if (previousStatus !== review.moderationStatus) {
+      const designer = await Designer.findById(review.designer);
+      if (designer) {
+        const ratings = await Review.find({ designer: designer._id, moderationStatus: 'approved' });
+        const average = ratings.length ? ratings.reduce((total, item) => total + item.rating, 0) / ratings.length : 0;
+        designer.rating = Number(average.toFixed(1));
+        designer.ratingCount = ratings.length;
+        await designer.save();
+      }
+    }
     return res.json({ review });
   } catch (error) {
     return next(error);

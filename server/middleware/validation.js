@@ -33,10 +33,14 @@ function isValidObjectId(value) {
   return mongoose.Types.ObjectId.isValid(value);
 }
 
+function escapeRegex(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function pagination(query) {
   const page = Math.max(1, Math.min(10000, Number.parseInt(query.page, 10) || 1));
   const limit = Math.max(1, Math.min(50, Number.parseInt(query.limit, 10) || 20));
   return { page, limit, skip: (page - 1) * limit };
 }
 
-module.exports = { isValidEmail, requireString, requireObjectId, isValidObjectId, pagination };
+module.exports = { isValidEmail, requireString, requireObjectId, isValidObjectId, escapeRegex, pagination };

@@ -13,7 +13,7 @@ function errorHandler(err, req, res, next) {
     console.error('Unhandled error:', err);
   }
 
-  const status = err.statusCode || (err.name === 'ValidationError' || err.name === 'CastError' ? 400 : 500);
+  const status = err.statusCode || (err.name === 'ValidationError' || err.name === 'CastError' || err.code === 11000 ? 400 : 500);
   const message = status === 500 && process.env.NODE_ENV === 'production'
     ? 'Something went wrong. Please try again.'
     : (err.message || 'Internal server error.');
