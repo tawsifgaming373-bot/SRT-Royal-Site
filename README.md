@@ -1,598 +1,96 @@
-<div align="center">
+# SRT Royal Site
 
-<img src="./L.png" alt="SRT ROYAL Logo" width="180"/>
+SRT Royal is a lightweight designer marketplace platform. Clients discover designers, submit hire requests, follow projects, initialize payments, and review completed work. Designers manage profiles, portfolios, requests, projects, and notifications. Admins monitor and moderate the platform.
 
-👑 SRT ROYAL Design
+## Stack
 
-Frontend Development With Royal Precision.
+- Node.js and Express
+- MongoDB Atlas through Mongoose
+- Vanilla HTML, CSS, and JavaScript frontend
+- JWT authentication and bcrypt password hashing
+- Helmet, CORS, rate limiting, and centralized errors
 
+## Architecture
 
+```text
+server.js                 Application entrypoint
+server/app.js             Express app factory and routes
+server/config             Database and environment configuration
+server/middleware         Authentication, validation, and errors
+server/models             Mongoose models
+server/routes             Auth, marketplace, workflow, admin, and payment APIs
+server/services           Notification, email, and storage boundaries
+public                    Existing SRT Royal frontend
+ tests                    Mongo-backed integration tests
+```
 
+## Configuration
 
+Copy `.env.example` to `.env` and set a MongoDB Atlas URI and a strong JWT secret. `.env` is ignored by Git.
 
-</div>
+Required for production:
 
-🌐 Live Website
+```text
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://...
+JWT_SECRET=<at least 32 random characters>
+JWT_EXPIRES_IN=7d
+CLIENT_URL=https://your-frontend.example
+```
 
-🚀 Visit SRT ROYAL Design
+Production uses Atlas. No local MongoDB service is required.
 
-SRT ROYAL Design is a modern designer marketplace and web platform where clients can discover designers, submit hire requests, manage projects, receive notifications, leave reviews, and initialize payments.
+Optional provider settings are documented in `.env.example` for email, cloud storage, and payments. The application does not claim an upload or payment succeeded without a real provider implementation or confirmation.
 
-The platform combines a responsive frontend with a Node.js/Express backend and MongoDB-powered data management.
+## Development
 
-✨ Features
+```text
+npm install
+npm run dev
+```
 
-🎨 Client Features
+The server serves the existing frontend at `http://localhost:3000`. In development, the database connection is optional; production startup validates `MONGODB_URI` and `JWT_SECRET`.
 
-🔐 User registration and login
+## Testing and build
 
-👤 User profile management
-
-🔎 Browse designers
-
-🧑‍💻 View designer profiles and portfolios
-
-📩 Submit hire requests
-
-📊 Track hire-request status
-
-🚀 Manage projects
-
-🔔 Receive notifications
-
-⭐ Review designers after completed projects
-
-💳 Initialize project payments
-
-🔑 Change account password
-
-📱 Responsive interface
-
-🧑‍💻 Designer Features
-
-Designer profile management
-
-Portfolio management
-
-Receive hire requests
-
-Accept or reject project requests
-
-Manage project status
-
-Receive notifications
-
-Build reputation through reviews and ratings
-
-🛡️ Admin Features
-
-Protected admin APIs
-
-Platform overview statistics
-
-User management
-
-Activate/deactivate user accounts
-
-Hire-request management
-
-Review moderation
-
-Project and user statistics
-
-Average rating statistics
-
-🏗️ Technology Stack
-
-Frontend
-
-HTML5
-
-CSS3
-
-Vanilla JavaScript
-
-Responsive UI
-
-Modern animations and interactions
-
-Google Fonts — Inter
-
-Backend
-
-Node.js
-
-Express.js
-
-Mongoose
-
-MongoDB Atlas
-
-Security
-
-JWT Authentication
-
-bcrypt password hashing
-
-Helmet security headers
-
-CORS
-
-Express Rate Limiting
-
-Request validation
-
-Centralized error handling
-
-Role-based authorization
-
-Deployment
-
-Vercel
-
-MongoDB Atlas
-
-📁 Project Structure
-
-SRT-Royal-Site/
-│
-├── api/
-│   └── index.js
-│
-├── public/
-│   ├── index.html
-│   ├── Login_page.html
-│   ├── app.js
-│   ├── style.css
-│   ├── styles.css
-│   ├── Logo_Image.png
-│   └── T.jpg
-│
-├── server/
-│   ├── config/
-│   │   ├── db.js
-│   │   └── env.js
-│   │
-│   ├── controllers/
-│   │   └── authController.js
-│   │
-│   ├── middleware/
-│   │   ├── auth.js
-│   │   ├── errorHandler.js
-│   │   └── validation.js
-│   │
-│   ├── models/
-│   │   ├── Designer.js
-│   │   ├── HireRequest.js
-│   │   ├── Notification.js
-│   │   ├── Payment.js
-│   │   ├── Project.js
-│   │   ├── Review.js
-│   │   └── User.js
-│   │
-│   ├── routes/
-│   │   ├── adminRoutes.js
-│   │   ├── authRoutes.js
-│   │   ├── designerRoutes.js
-│   │   ├── hireRequestRoutes.js
-│   │   ├── notificationRoutes.js
-│   │   ├── paymentRoutes.js
-│   │   ├── projectRoutes.js
-│   │   ├── reviewRoutes.js
-│   │   └── userRoutes.js
-│   │
-│   └── services/
-│       ├── emailService.js
-│       ├── notificationService.js
-│       └── storageService.js
-│
-├── tests/
-│   └── api.test.js
-│
-├── L.png
-├── .env.example
-├── .gitignore
-├── CONTRIBUTING.md
-├── package.json
-├── package-lock.json
-├── server.js
-└── vercel.json
-
-Logo: Keep the uploaded L.png file in the repository root so the logo appears at the top of this README on GitHub.
-
-🔄 Application Architecture
-
-                    ┌─────────────────────┐
-                    │     SRT ROYAL UI    │
-                    │ HTML/CSS/JavaScript │
-                    └──────────┬──────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │     Express API     │
-                    │       /api/*        │
-                    └──────────┬──────────┘
-                               │
-             ┌─────────────────┼─────────────────┐
-             │                 │                 │
-             ▼                 ▼                 ▼
-      ┌────────────┐    ┌─────────────┐   ┌────────────┐
-      │    Auth    │    │ Marketplace │   │   Admin    │
-      │ JWT/Bcrypt │    │   Workflow  │   │ Management │
-      └────────────┘    └──────┬──────┘   └────────────┘
-                                │
-                                ▼
-                       ┌────────────────┐
-                       │    Mongoose    │
-                       └───────┬────────┘
-                               │
-                               ▼
-                     ┌──────────────────┐
-                     │   MongoDB Atlas  │
-                     └──────────────────┘
-
-🔐 Authentication
-
-Authentication is handled with JSON Web Tokens.
-
-Authentication Endpoints
-
-Method
-
-Endpoint
-
-Access
-
-POST
-
-/api/auth/signup
-
-Public
-
-POST
-
-/api/auth/login
-
-Public
-
-POST
-
-/api/auth/logout
-
-Authenticated
-
-Protected requests use:
-
-Authorization: Bearer <JWT_TOKEN>
-
-Passwords are securely hashed using bcryptjs.
-
-📡 API Overview
-
-Base API:
-
-/api
-
-👤 Users
-
-GET    /api/users/me
-PUT    /api/users/profile
-PATCH  /api/users/password
-
-🎨 Designers
-
-GET    /api/designers
-GET    /api/designers/:id
-PATCH  /api/designers/:id
-
-📩 Hire Requests
-
-GET    /api/hire-requests
-POST   /api/hire-requests
-PATCH  /api/hire-requests/:id
-
-📁 Projects
-
-GET    /api/projects
-GET    /api/projects/:id
-PATCH  /api/projects/:id/status
-
-⭐ Reviews
-
-GET    /api/reviews
-POST   /api/reviews
-PATCH  /api/reviews/:id/moderate
-
-🔔 Notifications
-
-GET    /api/notifications
-PATCH  /api/notifications/:id/read
-PATCH  /api/notifications/read-all
-
-💳 Payments
-
-POST   /api/payments
-GET    /api/payments/project/:projectId
-
-🛡️ Admin
-
-GET    /api/admin/overview
-GET    /api/admin/users
-PATCH  /api/admin/users/:id/status
-GET    /api/admin/hire-requests
-PATCH  /api/admin/hire-requests/:id/status
-
-🔄 Hire & Project Workflow
-
-Client
-  │
-  ▼
-Browse Designers
-  │
-  ▼
-Select Designer
-  │
-  ▼
-Submit Hire Request
-  │
-  ├──────────────► Rejected
-  │
-  ▼
-Accepted
-  │
-  ▼
-Project Created
-  │
-  ▼
-In Progress
-  │
-  ▼
-Completed
-  │
-  ├──────────────► Review
-  │
-  └──────────────► Payment
-
-💳 Payment Flow
-
-The payment layer supports payment initialization for gateways such as:
-
-bKash
-Nagad
-SSLCommerz
-
-The correct production payment flow should be:
-
-Client
-   │
-   ▼
-Payment Initialization
-   │
-   ▼
-Payment Gateway
-   │
-   ▼
-Gateway Callback / Webhook
-   │
-   ▼
-Server-side Verification
-   │
-   ▼
-Payment Status Update
-
-⚠️ A pending payment record does not mean that a payment has been successfully completed. Production payment confirmation must be verified server-side through the gateway's callback/webhook system.
-
-🔔 Notifications
-
-The platform can notify users about important workflow events, including:
-
-New hire requests
-
-Accepted requests
-
-Rejected requests
-
-Project status changes
-
-Other platform events
-
-⭐ Reviews & Ratings
-
-Clients can review designers after eligible projects are completed.
-
-Review moderation supports:
-
-pending
-approved
-rejected
-
-Ratings contribute to designer reputation and platform statistics.
-
-🛡️ Security
-
-SRT ROYAL follows several security practices:
-
-JWT-based authentication
-
-Password hashing with bcrypt
-
-HTTP security headers with Helmet
-
-CORS configuration
-
-Rate limiting
-
-Request validation
-
-Role-based authorization
-
-Centralized error handling
-
-Server-side payment verification
-
-Environment-based secrets
-
-⚠️ Never Commit Secrets
-
-Never commit:
-
-.env
-MongoDB credentials
-JWT secrets
-API keys
-Payment credentials
-SMTP passwords
-
-Use environment variables for all sensitive configuration.
-
-🧪 Testing
-
-The project includes automated API tests using:
-
-Node.js test runner
-
-Supertest
-
-MongoDB Memory Server
-
-Run the test suite with:
-
+```text
+npm run build
 npm test
+```
 
-❤️ Health Check
+Tests use `mongodb-memory-server` only. The default test binary is MongoDB `4.2.25`, selected for compatibility with older CPUs such as the Intel Core 2 Duo E8400. It is downloaded and run as a test process, not installed as a local MongoDB server.
 
-The API exposes:
+## API overview
 
-GET /api/health
+- `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/logout`
+- `GET /api/users/me`, `PUT /api/users/profile`, `PATCH /api/users/password`
+- `GET /api/designers`, `GET /api/designers/:id`
+- `PATCH /api/designers/:id`, portfolio add/delete endpoints
+- `GET/POST /api/hire-requests`, `PATCH /api/hire-requests/:id`
+- `GET /api/projects`, `GET /api/projects/:id`, project status updates
+- `GET/POST /api/reviews`, admin moderation endpoint
+- `GET /api/notifications`, read and read-all endpoints
+- `POST /api/payments` initializes a pending payment only
+- `/api/admin/*` admin-only management and overview APIs
+- `GET /api/health` health check
 
-Expected response:
+All protected APIs require `Authorization: Bearer <token>`. Pagination accepts `page` and `limit`, with a maximum limit of 50.
 
-{
-  "status": "ok"
-}
+## Admin setup
 
-This can be used to verify that the deployed API is online.
+Admin accounts should be provisioned through a controlled administrative process. Public signup cannot assign the admin role in production. The integration tests may create an admin account in their isolated test environment.
 
-☁️ Deployment
+## Deployment
 
-The project is configured for Vercel deployment through:
+Deploy the Node process with `npm start`, provide environment variables through the hosting platform, and point `MONGODB_URI` to MongoDB Atlas. Configure `CLIENT_URL` to the deployed frontend origin and use the health endpoint for service checks. Enable Atlas backups, restrict network access, rotate JWT/provider credentials, and retain deployment logs outside the application database.
 
-api/index.js
-vercel.json
+## External requirements
 
-Production Website
+The following require provider credentials and operational setup before production use:
 
-https://srt-royal-site.vercel.app/
-
-The frontend and API can be served through the deployed Vercel application.
-
-📊 User Roles
-
-Role
-
-Main Capabilities
-
-👤 Client
-
-Hire designers, manage projects, reviews, notifications
-
-🎨 Designer
-
-Manage profile, portfolio, requests and projects
-
-🛡️ Admin
-
-Manage users, requests, reviews and platform statistics
-
-🗃️ Database Models
-
-The application uses these MongoDB/Mongoose models:
-
-User
-Designer
-HireRequest
-Project
-Review
-Notification
-Payment
-
-🤝 Contributing
-
-Contributions are welcome.
-
-Before submitting changes:
-
-Create a feature branch.
-
-Keep changes focused.
-
-Follow the existing project structure.
-
-Never commit secrets.
-
-Run the test suite.
-
-Verify the application locally.
-
-Submit a pull request with a clear description.
-
-Example:
-
-git checkout -b feature/new-feature
-git add .
-git commit -m "Add new feature"
-git push origin feature/new-feature
-
-🐛 Bug Reports
-
-When reporting a bug, include:
-
-What happened
-
-Expected behavior
-
-Steps to reproduce
-
-Relevant error message
-
-Whether the issue occurs locally or in production
-
-Never include passwords, tokens, database credentials, or private API keys in an issue.
-
-📌 Production Checklist
-
-Production MongoDB configured
-
-Strong JWT secret configured
-
-.env excluded from Git
-
-MongoDB access secured
-
-HTTPS enabled
-
-Production CLIENT_URL configured
-
-Payment callbacks/webhooks verified
-
-Production email provider configured
-
-Production storage provider configured
-
-Database backups enabled
-
-Error monitoring configured
-
-Admin access secured
-
-👑 SRT ROYAL Design
-
-Build. Design. Deliver. With Royal Precision.
-
-<div align="center">
-
-Made with ❤️ by SRT ROYAL Design
-
-🌐 Visit Website
-
-</div>
+- MongoDB Atlas cluster and restricted database user
+- Strong production JWT secret
+- Cloudinary or S3-compatible storage for image uploads
+- SMTP/email provider for transactional mail
+- bKash, Nagad, or SSLCommerz merchant credentials and verified callbacks
+- Hosting, HTTPS, monitoring, and backup configuration
