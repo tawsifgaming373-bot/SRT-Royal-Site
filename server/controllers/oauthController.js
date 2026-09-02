@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { signToken } = require('./authController');
+const { notifyOwner } = require('../services/emailService');
 
 const STATE_COOKIE = 'srt_oauth_state';
 
@@ -112,6 +113,7 @@ function startAuth(provider) {
 async function findOrCreateUser({ email, name, photo, provider }) {
   const normalizedEmail = String(email).trim().toLowerCase();
   let user = await User.findOne({ email: normalizedEmail });
+  let created = false;
   if (!user) {
     user = await User.create({
       name: String(name || normalizedEmail.split('@')[0]).trim().slice(0, 120),
@@ -120,8 +122,9 @@ async function findOrCreateUser({ email, name, photo, provider }) {
       provider,
       photo: photo || '',
     });
+    created = true;
   }
-  return user;
+  return { user, created };
 }
 
 async function handleCallback(provider, req, res, next) {
@@ -157,10 +160,21 @@ async function handleCallback(provider, req, res, next) {
       return res.status(400).send('Your provider account does not expose a verified email address.');
     }
 
-    const user = await findOrCreateUser(info);
+    const { user, created } = await findOrCreateUser(info);
     if (!user.isActive) return res.status(403).send('This account has been deactivated.');
 
     const token = signToken(user);
+
+    notifyOwner(created ? {
+      subject: `New account created: ${user.name}`,
+      text: `A new account was created via ${provider}.\n\nName: ${user.name}\nEmail: ${user.email}`,
+      html: `<p>A new account was created via <b>${provider}</b>.</p><p><b>Name:</b> ${user.name}<br/><b>Email:</b> ${user.email}</p>`,
+    } : {
+      subject: `Login: ${user.name}`,
+      text: `${user.name} (${user.email}) just logged in via ${provider}.`,
+      html: `<p><b>${user.name}</b> (${user.email}) just logged in via ${provider}.</p>`,
+    });
+
     res.setHeader('Set-Cookie', stateCookie('', 0));
     return res.redirect(`/Login_page.html#token=${encodeURIComponent(token)}`);
   } catch (error) {

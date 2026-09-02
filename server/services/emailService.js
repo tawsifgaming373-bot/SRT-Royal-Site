@@ -32,4 +32,17 @@ async function sendEmail({ to, subject, text, html }) {
   return { sent: true };
 }
 
-module.exports = { sendEmail };
+// Best-effort notification to the site owner. Never throws — a failed
+// notification email must never break the request that triggered it.
+async function notifyOwner({ subject, text, html }) {
+  const to = process.env.OWNER_EMAIL;
+  if (!to) return { sent: false, reason: 'OWNER_EMAIL is not configured.' };
+  try {
+    return await sendEmail({ to, subject, text, html });
+  } catch (error) {
+    console.error('Owner notification email failed:', error.message);
+    return { sent: false, reason: error.message };
+  }
+}
+
+module.exports = { sendEmail, notifyOwner };

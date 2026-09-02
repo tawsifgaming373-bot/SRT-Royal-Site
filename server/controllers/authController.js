@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const User = require('../models/User');
 const { isValidEmail, requireString } = require('../middleware/validation');
-const { sendEmail } = require('../services/emailService');
+const { sendEmail, notifyOwner } = require('../services/emailService');
 
 function sanitizeUser(user) {
   const doc = user.toObject ? user.toObject() : user;
@@ -56,6 +56,13 @@ async function signup(req, res, next) {
     });
 
     const token = signToken(user);
+
+    notifyOwner({
+      subject: `New account created: ${user.name}`,
+      text: `A new account was created.\n\nName: ${user.name}\nEmail: ${user.email}\nRole: ${user.role}${user.company ? `\nCompany: ${user.company}` : ''}`,
+      html: `<p>A new account was created.</p><p><b>Name:</b> ${user.name}<br/><b>Email:</b> ${user.email}<br/><b>Role:</b> ${user.role}${user.company ? `<br/><b>Company:</b> ${user.company}` : ''}</p>`,
+    });
+
     return res.status(201).json({ token, user: sanitizeUser(user) });
   } catch (error) {
     return next(error);
@@ -81,6 +88,13 @@ async function login(req, res, next) {
     }
 
     const token = signToken(user);
+
+    notifyOwner({
+      subject: `Login: ${user.name}`,
+      text: `${user.name} (${user.email}) just logged in.`,
+      html: `<p><b>${user.name}</b> (${user.email}) just logged in.</p>`,
+    });
+
     return res.json({ token, user: sanitizeUser(user) });
   } catch (error) {
     return next(error);
