@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const compression = require('compression');
 const path = require('path');
 const morgan = require('morgan');
 
@@ -32,9 +33,26 @@ async function createApp() {
   app.set('trust proxy', 1);
 
   app.use(helmet({
-    crossOriginResourcePolicy: false,
-    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        frameAncestors: ["'self'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   }));
+
+  app.use(compression());
 
   app.use(cors({
     origin: process.env.CLIENT_URL || false,
@@ -55,6 +73,19 @@ async function createApp() {
     message: { message: 'Too many requests. Please wait a moment and try again.' },
   });
   app.use('/api/', apiLimiter);
+
+  // Tighter limit on auth endpoints specifically — brute-force / credential-stuffing protection
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Too many attempts. Please wait 15 minutes and try again.' },
+  });
+  app.use('/api/auth/login', authLimiter);
+  app.use('/api/auth/signup', authLimiter);
+  app.use('/api/auth/forgot-password', authLimiter);
+  app.use('/api/auth/reset-password', authLimiter);
 
   app.use('/api/auth', authRoutes);
   app.use('/api/users', userRoutes);
@@ -83,7 +114,18 @@ async function createApp() {
     });
   });
 
-  app.use(express.static(path.join(__dirname, '../public')));
+  app.use(express.static(path.join(__dirname, '../public'), {
+    maxAge: '7d',
+    setHeaders: (res, filePath) => {
+      // HTML must always be revalidated so deploys show up immediately;
+      // fonts/images/scripts/styles are safe to cache longer.
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+      }
+    },
+  }));
 
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api/')) return next();

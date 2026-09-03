@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /admin-portal.html
+Disallow: /reset-password.html
+
+Sitemap: https://srt-royal-site.vercel.app/sitemap.xml
