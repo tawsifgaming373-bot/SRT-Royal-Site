@@ -5,6 +5,7 @@ const HireRequest = require('../models/HireRequest');
 const Review = require('../models/Review');
 const Project = require('../models/Project');
 const ContactMessage = require('../models/ContactMessage');
+const Payment = require('../models/Payment');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { requireObjectId, requireString } = require('../middleware/validation');
 
@@ -104,6 +105,59 @@ router.patch('/hire-requests/:id/status', async (req, res, next) => {
     request.status = nextStatus;
     await request.save();
     return res.json({ hireRequest: request });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// ── Payments — full financial visibility for the owner/admin ──
+router.get('/payments', async (req, res, next) => {
+  try {
+    const filter = req.query.status ? { status: String(req.query.status) } : {};
+    const payments = await Payment.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .populate('user', 'name email')
+      .populate('project', 'title')
+      .populate({ path: 'designer', populate: { path: 'user', select: 'name email' } })
+      .lean();
+    return res.json({ payments });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.get('/revenue', async (req, res, next) => {
+  try {
+    const [totals, byStatus] = await Promise.all([
+      Payment.aggregate([
+        { $match: { status: 'paid' } },
+        {
+          $group: {
+            _id: null,
+            totalGross: { $sum: '$amount' },
+            totalDeveloperEarnings: { $sum: '$developerShare' },
+            totalPlatformEarnings: { $sum: '$platformShare' },
+            totalPaidCount: { $sum: 1 },
+          },
+        },
+      ]),
+      Payment.aggregate([
+        { $group: { _id: '$status', count: { $sum: 1 }, amount: { $sum: '$amount' } } },
+      ]),
+    ]);
+
+    const summary = totals[0] || { totalGross: 0, totalDeveloperEarnings: 0, totalPlatformEarnings: 0, totalPaidCount: 0 };
+    const statusBreakdown = {};
+    byStatus.forEach((row) => { statusBreakdown[row._id] = { count: row.count, amount: row.amount }; });
+
+    return res.json({
+      totalRevenue: summary.totalGross,
+      developerEarnings: summary.totalDeveloperEarnings,
+      platformEarnings: summary.totalPlatformEarnings,
+      completedPayments: summary.totalPaidCount,
+      statusBreakdown,
+    });
   } catch (error) {
     return next(error);
   }

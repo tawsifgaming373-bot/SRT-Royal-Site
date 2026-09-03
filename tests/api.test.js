@@ -214,3 +214,93 @@ test('protected endpoints reject missing authentication', async () => {
 
   assert.equal(res.status, 401);
 });
+
+// ── Payment revenue-split security tests ──
+// Verifies the core financial rule from the product spec: the client can
+// NEVER control the amount they're charged or the developer/platform split.
+// Only the server-derived project.budget feeds the calculation.
+
+test('payment amount is derived from project.budget, never from the client, and splits 50/50', async () => {
+  const Project = require('../server/models/Project');
+  const User = require('../server/models/User');
+  const Designer = require('../server/models/Designer');
+
+  const paymentClient = await request(app).post('/api/auth/signup').send({
+    name: 'Payment Client', email: 'payclient@example.com', password: 'Password123!', role: 'client',
+  });
+  const clientToken = paymentClient.body.token;
+  const clientId = paymentClient.body.user.id || paymentClient.body.user._id;
+
+  const designerUser = await User.create({ name: 'Pay Designer', email: 'paydesigner@example.com', passwordHash: 'x', role: 'designer' });
+  const designer = await Designer.create({ user: designerUser._id, bio: 'test' });
+
+  const project = await Project.create({
+    client: clientId,
+    designer: designer._id,
+    title: 'Test Project',
+    budget: 200, // this is the ONLY source of truth for payment amount
+  });
+
+  // Client attempts to tamper: sends amount=1 hoping to pay $1 instead of $200.
+  const res = await request(app)
+    .post('/api/payments')
+    .set('Authorization', `Bearer ${clientToken}`)
+    .send({ projectId: project._id.toString(), gateway: 'manual', amount: 1 });
+
+  assert.equal(res.status, 202);
+  assert.equal(res.body.payment.amount, 200, 'amount must come from project.budget, not the tampered request body');
+  assert.equal(res.body.payment.developerShare, 100);
+  assert.equal(res.body.payment.platformShare, 100);
+  assert.equal(res.body.payment.developerShare + res.body.payment.platformShare, res.body.payment.netAmount);
+
+  global.__testPaymentId = res.body.payment._id || res.body.payment.id;
+  global.__testClientToken = clientToken;
+});
+
+test('unconfigured gateways are rejected with 501, not silently accepted', async () => {
+  const Project = require('../server/models/Project');
+  const project = await Project.findOne({ title: 'Test Project' });
+
+  const res = await request(app)
+    .post('/api/payments')
+    .set('Authorization', `Bearer ${global.__testClientToken}`)
+    .send({ projectId: project._id.toString(), gateway: 'sslcommerz' });
+
+  assert.equal(res.status, 501);
+  assert.match(res.body.message, /not connected/i);
+});
+
+test('non-admin cannot confirm a manual payment', async () => {
+  const res = await request(app)
+    .patch(`/api/payments/${global.__testPaymentId}/confirm`)
+    .set('Authorization', `Bearer ${global.__testClientToken}`)
+    .send({});
+
+  assert.equal(res.status, 403);
+});
+
+test('admin can confirm a manual payment, which marks the project paid', async () => {
+  const res = await request(app)
+    .patch(`/api/payments/${global.__testPaymentId}/confirm`)
+    .set('Authorization', `Bearer ${adminToken}`)
+    .send({ transactionId: 'MANUAL-TEST-1' });
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.payment.status, 'paid');
+  assert.equal(res.body.payment.transactionId, 'MANUAL-TEST-1');
+
+  const Project = require('../server/models/Project');
+  const project = await Project.findOne({ title: 'Test Project' });
+  assert.equal(project.paymentStatus, 'paid');
+});
+
+test('admin revenue endpoint reflects the confirmed payment', async () => {
+  const res = await request(app)
+    .get('/api/admin/revenue')
+    .set('Authorization', `Bearer ${adminToken}`);
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.totalRevenue, 200);
+  assert.equal(res.body.developerEarnings, 100);
+  assert.equal(res.body.platformEarnings, 100);
+});
