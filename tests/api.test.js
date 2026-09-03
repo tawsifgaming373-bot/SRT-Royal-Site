@@ -12,7 +12,7 @@ let token;
 let adminToken;
 
 async function setupMongoMemory() {
-  const mongoVersion = process.env.MONGOMS_VERSION || '4.2.25';
+  const mongoVersion = process.env.MONGOMS_VERSION || '7.0.14';
 
   mongoServer = await MongoMemoryServer.create({
     binary: { version: mongoVersion },
