@@ -71,6 +71,18 @@ router.get('/contact-messages', async (req, res, next) => {
   }
 });
 
+router.patch('/contact-messages/:id/handled', async (req, res, next) => {
+  try {
+    const message = await ContactMessage.findById(requireObjectId(req.params.id, 'Message ID'));
+    if (!message) return res.status(404).json({ message: 'Message not found.' });
+    message.handled = true;
+    await message.save();
+    return res.json({ message: 'Marked as handled.', contactMessage: message });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 router.get('/hire-requests', async (req, res, next) => {
   try {
     const requests = await HireRequest.find().sort({ createdAt: -1 }).populate('client', 'name email').populate('designer', 'user').lean();

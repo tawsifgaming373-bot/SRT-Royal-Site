@@ -33,6 +33,9 @@ function setAuth(token, user, remember = true) {
 }
 const clearAuth = () => { [TOKEN_KEY, USER_KEY].forEach((key) => { localStorage.removeItem(key); sessionStorage.removeItem(key); }); };
 
+/* ─── Separate portals: admin goes to admin-portal.html, everyone else to dashboard.html ─── */
+const portalUrlFor = (user) => (user && user.role === "admin" ? "admin-portal.html" : "dashboard.html");
+
 /* ─── OAuth: the server redirects back here with #token=... ─── */
 if (window.location.hash.startsWith("#token=")) {
   (async () => {
@@ -44,7 +47,7 @@ if (window.location.hash.startsWith("#token=")) {
       if (!res.ok) throw new Error("token rejected");
       const data = await safeJsonResponse(res);
       setAuth(token, data.user, true);
-      window.location.replace("index.html#profile-section");
+      window.location.replace(portalUrlFor(data.user));
     } catch (_) {
       showMsg(document.querySelector(".form-error"), "❌ Social sign-in failed. Please try again.", true);
     }
@@ -279,7 +282,7 @@ hireForm?.addEventListener("submit", async (e) => {
 
 /* ─── Redirect away from the login page if already signed in ─── */
 if (document.body.classList.contains('auth-page') && getToken() && getUser()) {
-  window.location.replace('index.html#profile-section');
+  window.location.replace(portalUrlFor(getUser()));
 }
 
 var authForms = document.querySelectorAll('.auth-card form.form-panel');
@@ -338,7 +341,7 @@ authForms.forEach(function (form) {
 
       setAuth(data.token, data.user, remember);
       showMsg(successEl, mode === 'signup' ? '✅ Account created! Redirecting…' : '✅ Signed in! Redirecting…');
-      setTimeout(() => { window.location.href = 'index.html#profile-section'; }, 600);
+      setTimeout(() => { window.location.href = portalUrlFor(data.user); }, 600);
     } catch (err) {
       showMsg(errorEl, `❌ ${err.message}`, true);
       if (submitBtn) {
@@ -833,6 +836,10 @@ async function renderCEOProfile(user) {
       <h4 class="profile-sub-title">📋 All Hire Requests</h4>
       <p class="text-muted" id="adminReqLoadingMsg">Loading requests…</p>
     </div>
+    <div id="adminMessagesWrap" style="margin-top:32px;">
+      <h4 class="profile-sub-title">✉️ Contact Messages</h4>
+      <p class="text-muted" id="adminMsgLoadingMsg">Loading messages…</p>
+    </div>
   `;
 
   $("#logoutBtn")?.addEventListener("click", () => {
@@ -924,6 +931,78 @@ async function renderCEOProfile(user) {
     const wrap = $("#adminRequestsWrap");
     if (wrap) wrap.innerHTML = `<h4 class="profile-sub-title">📋 Hire Requests</h4><p class="text-muted">Could not load requests.</p>`;
   }
+
+  // Load contact-form messages (name, email, phone, subject, message — saved to MongoDB
+  // and, when RESEND_API_KEY / EMAIL_FROM / OWNER_EMAIL are set, also emailed here)
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/contact-messages`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await safeJsonResponse(res);
+    const messages = data.messages || [];
+
+    const msgHtml = messages.length === 0
+      ? `<p class="text-muted">No messages yet.</p>`
+      : `<div class="table-wrap"><table class="requests-table">
+          <thead><tr><th>From</th><th>Subject</th><th>Message</th><th>Received</th><th>Status</th></tr></thead>
+          <tbody>${messages.map(m => `
+            <tr id="msg-row-${m._id || m.id}">
+              <td>
+                <strong>${escapeHtml(m.name)}</strong><br/>
+                <a href="mailto:${escapeHtml(m.email)}" style="color:var(--text-muted);font-size:.85rem;">${escapeHtml(m.email)}</a>
+                ${m.phone ? `<br/><span style="color:var(--text-muted);font-size:.85rem;">${escapeHtml(m.phone)}</span>` : ""}
+              </td>
+              <td>${escapeHtml(m.subject || "—")}</td>
+              <td style="max-width:280px;white-space:pre-wrap;">${escapeHtml(m.message)}</td>
+              <td style="color:var(--text-muted);font-size:.8rem;">${m.createdAt ? new Date(m.createdAt).toLocaleString() : "—"}</td>
+              <td id="msg-status-${m._id || m.id}">
+                ${m.handled
+                  ? `<span class="status-badge" style="background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;">✅ Handled</span>`
+                  : `<button class="btn btn-outline btn-sm mark-handled-btn" data-id="${m._id || m.id}">Mark handled</button>`
+                }
+              </td>
+            </tr>
+          `).join("")}</tbody>
+        </table></div>`;
+
+    const wrap = $("#adminMessagesWrap");
+    if (wrap) wrap.innerHTML = `<h4 class="profile-sub-title">✉️ Contact Messages (${messages.length})</h4>${msgHtml}`;
+
+    $$(".mark-handled-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = btn.dataset.id;
+        btn.disabled = true; btn.textContent = "Saving…";
+        const ok = await markContactMessageHandled(id);
+        if (ok) {
+          const cell = $(`#msg-status-${id}`);
+          if (cell) cell.innerHTML = `<span class="status-badge" style="background:#22c55e22;color:#22c55e;border:1px solid #22c55e44;">✅ Handled</span>`;
+        } else {
+          btn.disabled = false; btn.textContent = "Mark handled";
+        }
+      });
+    });
+  } catch (_) {
+    const wrap = $("#adminMessagesWrap");
+    if (wrap) wrap.innerHTML = `<h4 class="profile-sub-title">✉️ Contact Messages</h4><p class="text-muted">Could not load messages.</p>`;
+  }
+}
+
+/* ─── Admin: mark a contact-form message as handled ─── */
+async function markContactMessageHandled(id) {
+  const token = getToken();
+  if (!token) return false;
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/contact-messages/${id}/handled`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await safeJsonResponse(res);
+    if (!res.ok) throw new Error(data.message || "Update failed");
+    return true;
+  } catch (err) {
+    alert("Could not update message: " + err.message);
+    return false;
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -942,6 +1021,10 @@ function updateAuthUI() {
   navProfileLink?.classList.toggle("hidden", !loggedIn);
   authSection?.classList.toggle("hidden", loggedIn);
   profileSection?.classList.toggle("hidden", !loggedIn);
+
+  if (loggedIn && navProfileLink) {
+    navProfileLink.href = portalUrlFor(user);
+  }
 
   if (loggedIn) {
     if (user.role === "admin") {
