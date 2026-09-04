@@ -12,12 +12,22 @@ let token;
 let adminToken;
 
 async function setupMongoMemory() {
-  const mongoVersion = process.env.MONGOMS_VERSION || '7.0.14';
+  const mongoVersion = process.env.MONGOMS_VERSION || '7.0.3';
 
-  mongoServer = await MongoMemoryServer.create({
-    binary: { version: mongoVersion },
-    instance: { dbName: 'srt-royal-test' },
-  });
+  // MongoMemoryServer.create() has no built-in timeout — if the binary
+  // download stalls (happened in CI with version 7.0.14), the whole test
+  // run hangs silently instead of failing with a clear error. Race it
+  // against a hard timeout so a stuck download fails fast and loudly.
+  mongoServer = await Promise.race([
+    MongoMemoryServer.create({
+      binary: { version: mongoVersion },
+      instance: { dbName: 'srt-royal-test' },
+    }),
+    new Promise((_, reject) => setTimeout(
+      () => reject(new Error(`MongoMemoryServer.create() did not finish within 120s (binary version ${mongoVersion}). This usually means the MongoDB binary download stalled — try a different MONGOMS_VERSION.`)),
+      120000
+    )),
+  ]);
 
   const mongoUri = mongoServer.getUri();
   process.env.MONGODB_URI = mongoUri;
