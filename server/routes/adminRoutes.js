@@ -163,4 +163,51 @@ router.get('/revenue', async (req, res, next) => {
   }
 });
 
+// ── Developer approval workflow ──
+router.get('/designers', async (req, res, next) => {
+  try {
+    const filter = req.query.status ? { status: String(req.query.status) } : {};
+    const designers = await Designer.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .populate('user', 'name email photo role')
+      .lean();
+    return res.json({ designers });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.patch('/designers/:id/status', async (req, res, next) => {
+  try {
+    const designer = await Designer.findById(requireObjectId(req.params.id, 'Designer ID'));
+    if (!designer) return res.status(404).json({ message: 'Designer application not found.' });
+
+    const nextStatus = requireString(req.body.status, 'Status', { max: 20 });
+    if (!['approved', 'rejected'].includes(nextStatus)) {
+      return res.status(400).json({ message: "Status must be 'approved' or 'rejected'." });
+    }
+
+    designer.status = nextStatus;
+    designer.reviewedBy = req.user.id;
+    designer.reviewedAt = new Date();
+    if (nextStatus === 'rejected' && req.body.reason) {
+      designer.rejectionReason = requireString(req.body.reason, 'Rejection reason', { max: 500 });
+    }
+    await designer.save();
+
+    if (nextStatus === 'approved') {
+      // Grants designer-only API access (hire request handling, etc).
+      // Note: if this user is already logged in with a JWT issued before
+      // approval, that token still carries their old role — they need to
+      // log out and back in for the new permissions to take effect.
+      await User.findByIdAndUpdate(designer.user, { role: 'designer' });
+    }
+
+    return res.json({ designer, message: `Designer application ${nextStatus}.` });
+  } catch (error) {
+    return next(error);
+  }
+});
+
 module.exports = router;

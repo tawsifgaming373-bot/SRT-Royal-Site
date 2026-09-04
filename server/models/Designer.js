@@ -46,6 +46,14 @@ const designerSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
+  },
+  reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  reviewedAt: { type: Date, default: null },
+  rejectionReason: { type: String, default: '', trim: true },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -55,5 +63,6 @@ designerSchema.pre('save', function(next){ this.updatedAt = Date.now(); next(); 
 designerSchema.index({ rating: -1 });
 designerSchema.index({ skills: 1 });
 designerSchema.index({ categories: 1 });
+designerSchema.index({ status: 1 });
 
 module.exports = mongoose.model('Designer', designerSchema);

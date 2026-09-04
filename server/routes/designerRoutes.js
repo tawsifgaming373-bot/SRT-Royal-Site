@@ -1,16 +1,24 @@
 const express = require('express');
 const Designer = require('../models/Designer');
 const User = require('../models/User');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { pagination, requireObjectId, requireString, escapeRegex } = require('../middleware/validation');
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
+router.get('/', optionalAuth, async (req, res, next) => {
   try {
     const { page, limit, skip } = pagination(req.query);
     const { search, category, skill } = req.query;
     const filter = {};
+
+    // Only approved designers are publicly listed. Admins can see every
+    // status (e.g. add &status=pending to review new applications).
+    if (req.user && req.user.role === 'admin' && req.query.status) {
+      filter.status = String(req.query.status);
+    } else {
+      filter.status = 'approved';
+    }
 
     if (search) {
       const safeSearch = escapeRegex(String(search).slice(0, 100));
@@ -43,6 +51,12 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+/**
+ * Apply to become a designer. This does NOT immediately grant designer
+ * access — it creates a 'pending' profile that an admin must approve
+ * (see PATCH /api/admin/designers/:id/status). The applicant's account
+ * role stays as-is until approved.
+ */
 router.post('/', requireAuth, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
@@ -52,7 +66,14 @@ router.post('/', requireAuth, async (req, res, next) => {
 
     const existing = await Designer.findOne({ user: user._id });
     if (existing) {
-      return res.status(400).json({ message: 'Designer profile already exists.' });
+      return res.status(400).json({
+        message: existing.status === 'pending'
+          ? 'You already have a designer application awaiting review.'
+          : existing.status === 'rejected'
+            ? 'Your previous designer application was not approved. Contact support to reapply.'
+            : 'Designer profile already exists.',
+        designer: existing,
+      });
     }
 
     const designer = await Designer.create({
@@ -64,21 +85,29 @@ router.post('/', requireAuth, async (req, res, next) => {
       experience: Number(experience) || 0,
       pricing: pricing || { hourly: 0, project: 0, currency: 'USD' },
       availability: availability || 'Available',
+      status: 'pending',
     });
 
-    user.role = 'designer';
-    await user.save();
-
-    return res.status(201).json({ designer });
+    return res.status(201).json({
+      designer,
+      message: 'Application submitted. An admin will review it before your profile goes live.',
+    });
   } catch (error) {
     return next(error);
   }
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', optionalAuth, async (req, res, next) => {
   try {
     const designer = await Designer.findById(requireObjectId(req.params.id, 'Designer ID')).populate('user', 'name email photo company role').lean();
     if (!designer) return res.status(404).json({ message: 'Designer not found.' });
+
+    const isOwner = req.user && String(designer.user._id || designer.user) === String(req.user.id);
+    const isAdmin = req.user && req.user.role === 'admin';
+    if (designer.status !== 'approved' && !isOwner && !isAdmin) {
+      return res.status(404).json({ message: 'Designer not found.' });
+    }
+
     return res.json({ designer });
   } catch (error) {
     return next(error);

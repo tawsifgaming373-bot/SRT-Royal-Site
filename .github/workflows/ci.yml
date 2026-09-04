@@ -6,7 +6,8 @@ on:
 
 jobs:
   test:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       MONGOMS_VERSION: 7.0.14
     steps:
