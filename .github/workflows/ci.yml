@@ -31,4 +31,17 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm test
+      - name: Run tests
+        run: |
+          set +e
+          npm test > test-output.log 2>&1
+          code=$?
+          echo "::group::Full test output"
+          cat test-output.log
+          echo "::endgroup::"
+          if [ $code -ne 0 ]; then
+            TAIL=$(tail -c 4000 test-output.log)
+            ESCAPED=$(echo "$TAIL" | sed ':a;N;$!ba;s/\r/%0D/g;s/\n/%0A/g;s/%/%25/g')
+            echo "::error::npm test failed (exit $code). Tail of output:%0A$ESCAPED"
+            exit $code
+          fi
