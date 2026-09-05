@@ -12,29 +12,39 @@ let token;
 let adminToken;
 
 async function setupMongoMemory() {
+  process.env.JWT_SECRET = 'test-secret';
+  process.env.JWT_EXPIRES_IN = '1h';
+  process.env.NODE_ENV = 'test';
+  process.env.CLIENT_URL = 'http://localhost:3000';
+
+  // In CI, a real MongoDB runs as a Docker service (see .github/workflows/ci.yml)
+  // — no binary download needed at all, which is what was hanging before.
+  // Locally (or anywhere CI_MONGODB_URI isn't set), fall back to
+  // mongodb-memory-server, which downloads its own binary on first use.
+  if (process.env.CI_MONGODB_URI) {
+    process.env.MONGODB_URI = process.env.CI_MONGODB_URI;
+    app = await appFactory();
+    return;
+  }
+
   const mongoVersion = process.env.MONGOMS_VERSION || '7.0.3';
 
   // MongoMemoryServer.create() has no built-in timeout — if the binary
-  // download stalls (happened in CI with version 7.0.14), the whole test
-  // run hangs silently instead of failing with a clear error. Race it
-  // against a hard timeout so a stuck download fails fast and loudly.
+  // download stalls, the whole test run hangs silently instead of failing
+  // with a clear error. Race it against a hard timeout so a stuck download
+  // fails fast and loudly instead.
   mongoServer = await Promise.race([
     MongoMemoryServer.create({
       binary: { version: mongoVersion },
       instance: { dbName: 'srt-royal-test' },
     }),
     new Promise((_, reject) => setTimeout(
-      () => reject(new Error(`MongoMemoryServer.create() did not finish within 120s (binary version ${mongoVersion}). This usually means the MongoDB binary download stalled — try a different MONGOMS_VERSION.`)),
+      () => reject(new Error(`MongoMemoryServer.create() did not finish within 120s (binary version ${mongoVersion}). This usually means the MongoDB binary download stalled — try a different MONGOMS_VERSION, or set CI_MONGODB_URI to point at a real MongoDB instance instead.`)),
       120000
     )),
   ]);
 
-  const mongoUri = mongoServer.getUri();
-  process.env.MONGODB_URI = mongoUri;
-  process.env.JWT_SECRET = 'test-secret';
-  process.env.JWT_EXPIRES_IN = '1h';
-  process.env.NODE_ENV = 'test';
-  process.env.CLIENT_URL = 'http://localhost:3000';
+  process.env.MONGODB_URI = mongoServer.getUri();
   app = await appFactory();
 }
 
