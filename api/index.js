@@ -11,6 +11,11 @@ const mime = {
   '.xml': 'application/xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
 };
+// CSS/JS/HTML change often during active development and have no content-hash
+// in their filename, so browsers must always revalidate (fast — usually just
+// a 304, not a full re-download) instead of blindly trusting a stale copy for
+// days. Only images are safe to cache long, since those rarely change.
+const NO_CACHE_EXTENSIONS = new Set(['.html', '.css', '.js']);
 
 // Helmet only wraps the Express app below, which on Vercel only ever sees
 // /api/* requests — plain page/asset requests are served directly from this
@@ -45,7 +50,7 @@ module.exports = async function vercelHandler(req, res) {
       res.setHeader('Content-Type', mime[ext] || 'application/octet-stream');
       // HTML is revalidated on every request so a new deploy shows up immediately;
       // everything else (fonts, images, css, js) is safe to cache for a week.
-      res.setHeader('Cache-Control', ext === '.html' ? 'no-cache' : 'public, max-age=604800, immutable');
+      res.setHeader('Cache-Control', NO_CACHE_EXTENSIONS.has(ext) ? 'no-cache' : 'public, max-age=604800, immutable');
       return res.end(fs.readFileSync(filePath));
     }
     const indexPath = path.join(publicRoot, 'index.html');

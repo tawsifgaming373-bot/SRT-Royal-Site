@@ -117,9 +117,11 @@ async function createApp() {
   app.use(express.static(path.join(__dirname, '../public'), {
     maxAge: '7d',
     setHeaders: (res, filePath) => {
-      // HTML must always be revalidated so deploys show up immediately;
-      // fonts/images/scripts/styles are safe to cache longer.
-      if (filePath.endsWith('.html')) {
+      // HTML/CSS/JS change often during active development with no
+      // content-hash in the filename, so browsers must always revalidate
+      // (fast — usually just a 304) instead of trusting a stale copy for
+      // days. Only images are safe to cache long.
+      if (/\.(html|css|js)$/i.test(filePath)) {
         res.setHeader('Cache-Control', 'no-cache');
       } else {
         res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
