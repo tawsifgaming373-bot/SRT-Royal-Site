@@ -151,16 +151,29 @@ test('designer creation works for authenticated users', async () => {
 
   assert.equal(designerRes.status, 201);
   assert.equal(designerRes.body.designer.bio, 'I build premium interfaces');
+  assert.equal(designerRes.body.designer.status, 'pending', 'new designer profiles must start pending admin approval, not be public immediately');
+  global.__testDesignerId = designerRes.body.designer._id || designerRes.body.designer.id;
 });
 
-test('designer search finds matching profile', async () => {
-
-  const res = await request(app)
-    .get('/api/designers?search=premium');
+test('pending (unapproved) designers are not publicly searchable', async () => {
+  const res = await request(app).get('/api/designers?search=premium');
 
   assert.equal(res.status, 200);
   assert.ok(Array.isArray(res.body.designers));
-  assert.ok(res.body.designers.length >= 1);
+  assert.equal(res.body.designers.length, 0, 'an unapproved designer must not appear in the public listing');
+});
+
+test('admin can approve a pending designer, after which it becomes publicly searchable', async () => {
+  const approveRes = await request(app)
+    .patch(`/api/admin/designers/${global.__testDesignerId}/status`)
+    .set('Authorization', `Bearer ${adminToken}`)
+    .send({ status: 'approved' });
+
+  assert.equal(approveRes.status, 200);
+
+  const res = await request(app).get('/api/designers?search=premium');
+  assert.equal(res.status, 200);
+  assert.ok(res.body.designers.length >= 1, 'an approved designer must appear in the public listing');
 });
 
 test('hire request creation works for authenticated client', async () => {
