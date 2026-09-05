@@ -1,96 +1,131 @@
-# SRT Royal Site
+# SRT Royal Design
 
-SRT Royal is a lightweight designer marketplace platform. Clients discover designers, submit hire requests, follow projects, initialize payments, and review completed work. Designers manage profiles, portfolios, requests, projects, and notifications. Admins monitor and moderate the platform.
+**Live site:** https://srt-royal-site.vercel.app
+[![CI](https://github.com/tawsifgaming373-bot/SRT-Royal-Site/actions/workflows/ci.yml/badge.svg)](https://github.com/tawsifgaming373-bot/SRT-Royal-Site/actions/workflows/ci.yml)
+
+SRT Royal Design is a frontend development studio's personal portfolio, built as a full hiring platform: clients discover and hire frontend designers, projects move through a real workflow, payments split automatically between designer and platform, and completed work earns a public star rating. The owner runs everything from a dedicated admin portal.
+
+---
+
+## What it actually does
+
+**For clients**
+- Browse and search designers by skill, category, and rating
+- Submit a hire request to a specific designer, or a general inquiry that auto-assigns the top-rated one
+- Track project status end-to-end (pending → accepted → in progress → completed)
+- Pay for a completed project and see the payment recorded
+- Leave a star rating + written review once a project is done — reviews are what feed the "Developer Rating" shown on every designer's public profile and card
+- Get notified when a request is accepted, a project moves forward, or a message arrives
+
+**For designers**
+- Apply with a professional profile (bio, skills, categories, pricing, portfolio)
+- Profiles start `pending` and only appear publicly once an admin approves them — no unreviewed profile goes live
+- Accept/reject hire requests, manage active projects
+- Rating is calculated from real client reviews only, never fabricated
+
+**For the owner (admin)**
+- Separate admin portal (`/admin-portal.html`), gated by role — not just a hidden button on the client page
+- Approve or reject designer applications
+- Full visibility into every payment and the platform's revenue split (`/api/admin/revenue`)
+- See every contact-form submission, hire request, project, and user in one place
+- Review moderation
+
+**Revenue model**
+- Every completed payment splits 50% designer / 50% platform, calculated **only on the server** (`server/config/businessRules.js`) — a client can never influence the amount they're charged or how it's split by editing a request
+- The amount charged is always pulled from the project's own record, never trusted from the browser
+- No payment gateway is faked. Until a real one (bKash/Nagad/SSLCommerz) is wired up with verified webhooks, payments are recorded pending and confirmed manually by an admin — clearly labeled as such, never presented as a live transaction
+
+---
 
 ## Stack
 
-- Node.js and Express
-- MongoDB Atlas through Mongoose
-- Vanilla HTML, CSS, and JavaScript frontend
-- JWT authentication and bcrypt password hashing
-- Helmet, CORS, rate limiting, and centralized errors
+- **Backend:** Node.js, Express, MongoDB (Mongoose), JWT auth, bcrypt
+- **Frontend:** Vanilla HTML/CSS/JS — no framework, no build step
+- **Security:** Helmet (real CSP, not disabled), rate limiting (stricter on auth endpoints), centralized error handling, server-side financial validation
+- **Hosting:** Vercel (serverless), with its own static-file layer that mirrors Express's security headers and caching rules
+- **Tests:** Node's built-in test runner + Supertest, against a real MongoDB (Docker service in CI, `mongodb-memory-server` locally)
 
 ## Architecture
 
 ```text
-server.js                 Application entrypoint
-server/app.js             Express app factory and routes
-server/config             Database and environment configuration
-server/middleware         Authentication, validation, and errors
-server/models             Mongoose models
-server/routes             Auth, marketplace, workflow, admin, and payment APIs
-server/services           Notification, email, and storage boundaries
-public                    Existing SRT Royal frontend
- tests                    Mongo-backed integration tests
+server.js                 Local dev entrypoint
+api/index.js               Vercel serverless entrypoint (also serves /public directly)
+server/app.js               Express app factory: security headers, rate limits, routes
+server/config/               Env validation, centralized revenue-split rule
+server/middleware/           Auth, role checks, input validation
+server/models/                User, Designer, Project, HireRequest, Payment, Review, Notification, ContactMessage
+server/routes/                 REST API, grouped by domain
+server/services/                Email, notifications, payment-gateway abstraction
+public/                          Frontend — portfolio, marketplace, dashboards
+tests/                              Integration tests (real HTTP requests, real DB)
 ```
 
 ## Configuration
 
-Copy `.env.example` to `.env` and set a MongoDB Atlas URI and a strong JWT secret. `.env` is ignored by Git.
-
-Required for production:
+Copy `.env.example` to `.env`. Required for production:
 
 ```text
 NODE_ENV=production
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=<at least 32 random characters>
 JWT_EXPIRES_IN=7d
-CLIENT_URL=https://your-frontend.example
+CLIENT_URL=https://your-deployed-domain
+RESEND_API_KEY=...
+EMAIL_FROM="SRT Royal <noreply@yourdomain.com>"
+OWNER_EMAIL=you@example.com
 ```
 
-Production uses Atlas. No local MongoDB service is required.
-
-Optional provider settings are documented in `.env.example` for email, cloud storage, and payments. The application does not claim an upload or payment succeeded without a real provider implementation or confirmation.
+Production start-up refuses to boot without `MONGODB_URI` and a `JWT_SECRET` of at least 32 characters — it will not silently fall back to an insecure default.
 
 ## Development
 
-```text
+```bash
 npm install
 npm run dev
 ```
 
-The server serves the existing frontend at `http://localhost:3000`. In development, the database connection is optional; production startup validates `MONGODB_URI` and `JWT_SECRET`.
+Serves the site at `http://localhost:3000`. Local development doesn't require a database connection to boot, but most routes will fail without one.
 
-## Testing and build
+## Testing
 
-```text
-npm run build
+```bash
 npm test
 ```
 
-Tests use `mongodb-memory-server` only. The default test binary is MongoDB `4.2.25`, selected for compatibility with older CPUs such as the Intel Core 2 Duo E8400. It is downloaded and run as a test process, not installed as a local MongoDB server.
+Runs real HTTP requests against the actual Express app and a real MongoDB instance — nothing is mocked at the route layer. CI runs this on every push against a `mongo:7` Docker service (see `.github/workflows/ci.yml`); locally it falls back to `mongodb-memory-server`, which downloads its own binary on first run.
+
+Current coverage includes: auth flows, role-based access control, the developer-approval workflow (a pending designer is not publicly searchable; an approved one is), hire-request validation (an invalid designer ID is rejected, not silently reassigned), and the full payment/revenue-split path (tampered amounts are ignored, unconfigured gateways are rejected, only an admin can confirm a manual payment).
 
 ## API overview
 
-- `POST /api/auth/signup`, `POST /api/auth/login`, `POST /api/auth/logout`
-- `GET /api/users/me`, `PUT /api/users/profile`, `PATCH /api/users/password`
-- `GET /api/designers`, `GET /api/designers/:id`
-- `PATCH /api/designers/:id`, portfolio add/delete endpoints
-- `GET/POST /api/hire-requests`, `PATCH /api/hire-requests/:id`
-- `GET /api/projects`, `GET /api/projects/:id`, project status updates
-- `GET/POST /api/reviews`, admin moderation endpoint
-- `GET /api/notifications`, read and read-all endpoints
-- `POST /api/payments` initializes a pending payment only
-- `/api/admin/*` admin-only management and overview APIs
-- `GET /api/health` health check
+| Area | Endpoints |
+|---|---|
+| Auth | `POST /api/auth/signup`, `/login`, `/logout`, `/forgot-password`, `/reset-password`, Google/GitHub OAuth |
+| Users | `GET /api/users/me`, `PUT /api/users/profile`, `PATCH /api/users/password` |
+| Designers | `GET /api/designers` (public, approved-only), `GET /api/designers/:id`, `POST/PATCH /api/designers/:id` |
+| Hire requests | `GET/POST /api/hire-requests`, `PATCH /api/hire-requests/:id` |
+| Projects | `GET /api/projects`, `GET /api/projects/:id`, status updates |
+| Reviews | `GET/POST /api/reviews` — this is what powers designer ratings |
+| Payments | `POST /api/payments` (amount always server-derived), `PATCH /api/payments/:id/confirm` (admin-only) |
+| Admin | `/api/admin/users`, `/designers`, `/designers/:id/status` (approve/reject), `/hire-requests`, `/payments`, `/revenue`, `/contact-messages` |
+| Notifications | `GET /api/notifications`, mark read |
+| Health | `GET /api/health` |
 
-All protected APIs require `Authorization: Bearer <token>`. Pagination accepts `page` and `limit`, with a maximum limit of 50.
+All protected routes require `Authorization: Bearer <token>`. List endpoints accept `page`/`limit` (max 50).
 
-## Admin setup
+## Security notes
 
-Admin accounts should be provisioned through a controlled administrative process. Public signup cannot assign the admin role in production. The integration tests may create an admin account in their isolated test environment.
+- Every financial value (amount, developer share, platform share) is calculated server-side from `server/config/businessRules.js` — the single source of truth for the revenue split percentage
+- Real Content-Security-Policy, not `contentSecurityPolicy: false`
+- Auth endpoints (login/signup/password reset) have a dedicated stricter rate limit against brute-force attempts
+- Designer profiles require admin approval before they're publicly visible or searchable
+- Sensitive actions (admin routes, payment confirmation) check the role on the server via JWT, never trust a role sent from the browser
 
 ## Deployment
 
-Deploy the Node process with `npm start`, provide environment variables through the hosting platform, and point `MONGODB_URI` to MongoDB Atlas. Configure `CLIENT_URL` to the deployed frontend origin and use the health endpoint for service checks. Enable Atlas backups, restrict network access, rotate JWT/provider credentials, and retain deployment logs outside the application database.
+Live on Vercel, deployed from `main`. `api/index.js` handles both the API routes and serving `/public` directly (Vercel doesn't run Express's static middleware for non-API paths). Required environment variables are the same as local `.env`, set in the Vercel project settings.
 
-## External requirements
+## External requirements not yet configured
 
-The following require provider credentials and operational setup before production use:
-
-- MongoDB Atlas cluster and restricted database user
-- Strong production JWT secret
-- Cloudinary or S3-compatible storage for image uploads
-- SMTP/email provider for transactional mail
-- bKash, Nagad, or SSLCommerz merchant credentials and verified callbacks
-- Hosting, HTTPS, monitoring, and backup configuration
+- A real payment gateway (bKash/Nagad/SSLCommerz) with verified webhook signature checking — payments currently require manual admin confirmation
+- Cloud storage (Cloudinary/S3) for designer portfolio image uploads at scale
