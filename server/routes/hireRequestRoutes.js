@@ -49,11 +49,22 @@ router.post('/', optionalAuth, async (req, res, next) => {
     }
 
     let designer = null;
-    if (designerId && mongoose.Types.ObjectId.isValid(designerId)) {
+    if (designerId) {
+      // A designerId was explicitly provided — it must resolve to a real
+      // designer. Silently falling back to a different (auto-assigned)
+      // designer here would mean the client ends up paired with someone
+      // they didn't choose, with no indication anything went wrong.
+      if (!mongoose.Types.ObjectId.isValid(designerId)) {
+        return res.status(400).json({ message: 'The selected designer could not be found. Please choose a designer again.' });
+      }
       designer = await Designer.findById(designerId);
-    }
-    if (!designer) {
-      // No specific designer chosen (or not found): auto-assign the top-rated one.
+      if (!designer) {
+        return res.status(400).json({ message: 'The selected designer could not be found. Please choose a designer again.' });
+      }
+    } else {
+      // No designer specified at all — this is a legitimate general inquiry
+      // ("Hire Me" style request with no specific pick), so auto-assign the
+      // top-rated available designer.
       designer = await Designer.findOne().sort({ rating: -1, createdAt: -1 });
     }
 
