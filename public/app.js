@@ -1036,9 +1036,50 @@ function updateAuthUI() {
   }
 }
 
+/* ─── Load real testimonials on the homepage (no fake placeholder cards) ─── */
+async function loadTestimonials() {
+  const list = $("#testimonialsList");
+  if (!list) return; // only present on index.html
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reviews?limit=6`);
+    const data = await safeJsonResponse(res);
+    const reviews = data.reviews || [];
+
+    if (reviews.length === 0) {
+      list.innerHTML = `<p class="text-muted" style="grid-column:1/-1;text-align:center;">No reviews yet — be the first to share your experience below.</p>`;
+      return;
+    }
+
+    list.innerHTML = reviews.map((r) => {
+      const name = (r.client && r.client.name) || "Client";
+      const stars = "★".repeat(r.rating) + "☆".repeat(5 - r.rating);
+      return `
+        <div class="testimonial-card reveal visible">
+          <div class="tcard-top">
+            <div class="tcard-stars">${stars}</div>
+            <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1-1s0-1-1-1c-1 0-3-.038-4-1H2c0 1-1 3-1 5s0 4 6 5 7-1 7-4V5c0-1.25-.757-2.017-2-2s-2.75-.75-4-1.972V11c0 1-1 2-2 2s-4.003-1-4.003-5.002S2 5 3 5"/></svg>
+          </div>
+          <p class="tcard-text">${escapeHtml(r.comment)}</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar">${escapeHtml(name.charAt(0).toUpperCase())}</div>
+            <div>
+              <strong>${escapeHtml(name)}</strong>
+              <span>Client</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (_) {
+    list.innerHTML = `<p class="text-muted" style="grid-column:1/-1;text-align:center;">Could not load reviews right now.</p>`;
+  }
+}
+
 /* ─── Auto-login on page load ─── */
 (async () => {
   await loadMarketplaceOptions();
+  await loadTestimonials();
   if (getToken()) {
     await loadFullProfile();
     updateAuthUI();
