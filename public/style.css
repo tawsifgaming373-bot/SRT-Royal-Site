@@ -1828,3 +1828,63 @@ h1,h2,h3,h4 { font-family: var(--font-head); line-height: 1.15; }
 @media (max-width: 768px) {
   .nav-notif-dropdown { position: fixed; top: 74px; right: 12px; left: 12px; width: auto; }
 }
+
+/* ─── ADMIN PORTFOLIO: CASE STUDY ─── */
+.case-study-card {
+  background: var(--navy-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+}
+.case-study-card h3 { font-size: 1.3rem; margin-bottom: 22px; }
+.case-study-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.case-study-item p { color: var(--text-muted); font-size: .92rem; line-height: 1.7; margin-top: 8px; }
+.case-study-label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 50px;
+}
+@media (max-width: 768px) {
+  .case-study-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── ADMIN PORTFOLIO: EXPERIENCE TIMELINE ─── */
+.exp-timeline {
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+  padding-left: 32px;
+  border-left: 2px solid var(--border);
+}
+.exp-item { position: relative; padding-bottom: 36px; }
+.exp-item:last-child { padding-bottom: 0; }
+.exp-dot {
+  position: absolute;
+  left: -39px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px var(--navy), 0 0 14px var(--gold-glow);
+}
+.exp-content h3 { font-size: 1.1rem; margin-bottom: 4px; }
+.exp-period {
+  display: block;
+  color: var(--gold);
+  font-size: .82rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.exp-content p { color: var(--text-muted); font-size: .92rem; line-height: 1.7; }

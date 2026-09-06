@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Portfolio — SR. Tawsif | SRT Royal Design</title>
+  <meta name="description" content="Personal portfolio of SR. Tawsif — Founder of SRT Royal Design. Projects, skills, experience and case studies."/>
+  <link rel="canonical" href="https://srt-royal-site.vercel.app/admin-portfolio.html"/>
+  <meta property="og:title" content="Admin Portfolio — SR. Tawsif"/>
+  <meta property="og:description" content="Personal portfolio of SR. Tawsif — Founder of SRT Royal Design."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="https://srt-royal-site.vercel.app/Logo_Image.png"/>
+  <meta property="og:url" content="https://srt-royal-site.vercel.app/admin-portfolio.html"/>
+  <meta name="twitter:card" content="summary"/>
+  <link rel="icon" type="image/png" href="Logo_Image.png"/>
+  <link rel="apple-touch-icon" href="Logo_Image.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <a href="#home" class="skip-link">Skip to main content</a>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- ══════════════ NAVBAR ══════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a class="nav-logo" href="index.html">
+        <img src="Logo_Image.png" alt="SRT ROYAL Design" class="nav-logo-img" onerror="this.style.display='none'"/>
+        <span class="logo-text">SRT <span class="logo-accent">Royal</span> Design</span>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="nav-link">Home</a></li>
+        <li><a href="designers.html" class="nav-link">Designers</a></li>
+        <li><a href="hire.html" class="nav-link">Hire</a></li>
+        <li><a href="contact.html" class="nav-link">Contact</a></li>
+        <li><a href="admin-portfolio.html" class="nav-link active">Admin Portfolio</a></li>
+        <li><a href="Login_page.html" class="nav-link" id="navAuthLink">Login</a></li>
+        <li><a href="index.html#profile-section" class="nav-link nav-login-link hidden" id="navProfileLink">My Account</a></li>
+        <li class="nav-notif-wrap hidden" id="navNotifWrap">
+          <button class="nav-notif-btn" id="navNotifBtn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+            🔔<span class="nav-notif-badge hidden" id="navNotifBadge">0</span>
+          </button>
+          <div class="nav-notif-dropdown hidden" id="navNotifDropdown">
+            <div class="nav-notif-dropdown-header">
+              <strong>Notifications</strong>
+              <button class="nav-notif-markall" id="navNotifMarkAll">Mark all read</button>
+            </div>
+            <div class="nav-notif-list" id="navNotifList">
+              <p class="text-muted" style="padding:16px;text-align:center;">No notifications yet.</p>
+            </div>
+          </div>
+        </li>
+        <li><a href="hire.html" class="btn btn-gold nav-cta">Let's Work Together</a></li>
+      </ul>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" id="home">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-glow glow-1"></div>
+    <div class="hero-glow glow-2" data-speed="0.18"></div>
+    <div class="hero-container">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Admin Portfolio</span>
+      </div>
+      <h1 class="hero-headline">
+        Hi, I'm <span class="text-gold">SR. Tawsif</span>
+      </h1>
+      <p class="hero-sub">
+        Frontend Developer &amp; Designer — Founder of SRT Royal Design. I build fast,
+        functional, pixel-perfect web experiences from idea to deployment.
+      </p>
+      <div class="hero-actions">
+        <a href="#admin-projects" class="btn btn-gold btn-lg">
+          <span>View My Work</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#admin-contact" class="btn btn-outline btn-lg">Contact Me</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ ABOUT ══════════════ -->
+  <section class="section about-section" id="admin-about">
+    <div class="parallax-cloud" data-speed="0.06" style="top:5%; right:-10%;"><div class="parallax-cloud__inner parallax-cloud--gold parallax-cloud--md"></div></div>
+    <div class="container">
+      <div class="about-layout">
+        <div class="about-visual reveal-left">
+          <div class="about-visual-frame">
+            <img src="T.jpg" alt="SR. Tawsif" class="about-photo" width="800" height="1067" loading="lazy" decoding="async" onerror="this.src='https://ui-avatars.com/api/?name=Tawsif&background=FFD700&color=0A0F1E&size=400'"/>
+            <div class="about-code-chip">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>Admin</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-content reveal-right">
+          <span class="section-tag">About Me</span>
+          <h2 class="section-title">Who I <span class="text-gold">Am</span></h2>
+          <p>
+            I'm SR. Tawsif, a frontend-focused web developer based in Bangladesh and the
+            founder of SRT Royal Design. I work across the full stack — HTML, CSS and
+            JavaScript on the frontend, Node.js and Express on the backend — to design and
+            ship responsive, high-performance websites and web apps.
+          </p>
+          <p>
+            Beyond client work, I build my own products end-to-end: from planning the data
+            model, to the UI, to deployment — always aiming for clean code and an interface
+            that feels effortless to use.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SKILLS ══════════════ -->
+  <section class="section skills-section" id="admin-skills">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Toolkit</span>
+        <h2 class="section-title">Skills &amp; <span class="text-gold">Technologies</span></h2>
+        <p class="section-desc">Development and design tools I use to build end-to-end products</p>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card reveal"><span class="skill-icon">🌐</span><span>HTML5</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">🎨</span><span>CSS3</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">⚡</span><span>JavaScript</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">🟢</span><span>Node.js</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">🚂</span><span>Express</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">🍃</span><span>MongoDB</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">📱</span><span>Responsive Design</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">✨</span><span>UI/UX Design</span></div>
+        <div class="skill-card reveal"><span class="skill-icon">🔧</span><span>Git &amp; GitHub</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FEATURED PROJECTS ══════════════ -->
+  <section class="section portfolio-section" id="admin-projects">
+    <div class="parallax-cloud" data-speed="0.08" style="top:-8%; left:-6%;"><div class="parallax-cloud__inner parallax-cloud--soft parallax-cloud--lg"></div></div>
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Recent Work</span>
+        <h2 class="section-title">Featured <span class="text-gold">Projects</span></h2>
+        <p class="section-desc">A look at products I've designed and built from the ground up</p>
+      </div>
+      <div class="portfolio-grid">
+        <div class="portfolio-card">
+          <div class="portfolio-thumb thumb-2">
+            <div class="thumb-chrome"><span></span><span></span><span></span></div>
+            <div class="thumb-body">
+              <span class="thumb-glyph">🧾</span>
+            </div>
+          </div>
+          <div class="portfolio-info">
+            <h3>Accounting App</h3>
+            <p>A web-based accounting tool for tracking income, expenses and generating simple financial reports.</p>
+            <div class="portfolio-tags">
+              <span class="skill-tag">JavaScript</span>
+              <span class="skill-tag">Node.js</span>
+              <span class="skill-tag">Dashboard</span>
+            </div>
+            <div class="portfolio-tags" style="margin-top:4px;">
+              <a href="https://accounting-app-kappa-silk.vercel.app/" target="_blank" rel="noopener" class="portfolio-link">Live Demo
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </a>
+              <a href="https://github.com/tawsifgaming373-bot" target="_blank" rel="noopener" class="portfolio-link">GitHub
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CASE STUDIES ══════════════ -->
+  <section class="section case-study-section" id="admin-case-studies">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Deep Dive</span>
+        <h2 class="section-title">Case <span class="text-gold">Studies</span></h2>
+        <p class="section-desc">A closer look at how one of my projects came together</p>
+      </div>
+      <div class="case-study-card reveal">
+        <h3>Accounting App</h3>
+        <div class="case-study-grid">
+          <div class="case-study-item">
+            <span class="case-study-label">Problem</span>
+            <p>Small businesses and freelancers needed a simple way to track income and expenses without learning complex accounting software.</p>
+          </div>
+          <div class="case-study-item">
+            <span class="case-study-label">Solution</span>
+            <p>Built a lightweight, responsive web app with clear forms for logging transactions and an at-a-glance dashboard for balances.</p>
+          </div>
+          <div class="case-study-item">
+            <span class="case-study-label">Result</span>
+            <p>A fast, easy-to-use tool that's live and deployed on Vercel, giving users an instant financial overview.</p>
+          </div>
+        </div>
+        <div class="portfolio-tags" style="margin-top:20px;">
+          <span class="skill-tag">JavaScript</span>
+          <span class="skill-tag">Node.js</span>
+          <span class="skill-tag">Vercel</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ EXPERIENCE ══════════════ -->
+  <section class="section exp-section" id="admin-experience">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Journey</span>
+        <h2 class="section-title">Experience</h2>
+      </div>
+      <div class="exp-timeline">
+        <div class="exp-item reveal">
+          <div class="exp-dot"></div>
+          <div class="exp-content">
+            <h3>Founder &amp; Lead Developer</h3>
+            <span class="exp-period">SRT Royal Design · Present</span>
+            <p>Designing and building the SRT Royal Design platform — a hiring marketplace connecting clients with frontend designers, complete with auth, dashboards and a review system.</p>
+          </div>
+        </div>
+        <div class="exp-item reveal">
+          <div class="exp-dot"></div>
+          <div class="exp-content">
+            <h3>Freelance Frontend Developer</h3>
+            <span class="exp-period">Self-employed</span>
+            <p>Building responsive, pixel-perfect websites and small web apps for clients using HTML, CSS, JavaScript and Node.js.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ TESTIMONIALS ══════════════ -->
+  <section class="section testimonials-section" id="admin-testimonials">
+    <div class="parallax-cloud" data-speed="0.05" style="top:0%; left:-8%;"><div class="parallax-cloud__inner parallax-cloud--soft parallax-cloud--md"></div></div>
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">Testimonials</span>
+        <h2 class="section-title">What People <span class="text-gold">Say</span></h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card reveal visible">
+          <div class="tcard-top">
+            <div class="tcard-stars">★★★★★</div>
+            <svg class="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1-1s0-1-1-1c-1 0-3-.038-4-1H2c0 1-1 3-1 5s0 4 6 5 7-1 7-4V5c0-1.25-.757-2.017-2-2s-2.75-.75-4-1.972V11c0 1-1 2-2 2s-4.003-1-4.003-5.002S2 5 3 5"/></svg>
+          </div>
+          <p class="tcard-text">Tawsif delivered exactly what we needed — clean code, fast turnaround and great communication throughout.</p>
+          <div class="tcard-author">
+            <div class="tcard-avatar">C</div>
+            <div><strong>Client</strong><span>Web Project</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CONTACT ══════════════ -->
+  <section class="section contact-cta-section" id="admin-contact">
+    <div class="container">
+      <div class="contact-cta reveal">
+        <h2 class="section-title">Let's Work <span class="text-gold">Together.</span></h2>
+        <p class="section-desc">Reach out through any of the channels below.</p>
+        <div class="contact-cta-links">
+          <a href="mailto:tawsifgaming373@gmail.com">Email</a>
+          <span class="cta-link-divider"></span>
+          <a href="https://github.com/tawsifgaming373-bot" target="_blank" rel="noopener">GitHub</a>
+          <span class="cta-link-divider"></span>
+          <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+          <span class="cta-link-divider"></span>
+          <a href="#" target="_blank" rel="noopener">Fiverr</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="footer" id="footer">
+    <div class="parallax-cloud" data-speed="0.04" style="top:-15%; right:-8%;"><div class="parallax-cloud__inner parallax-cloud--gold parallax-cloud--lg"></div></div>
+    <div class="footer-top">
+      <div class="container footer-grid">
+        <div class="footer-brand-col">
+          <a class="footer-logo" href="index.html">
+            <img src="Logo_Image.png" alt="SRT" class="nav-logo-img" onerror="this.style.display='none'"/>
+            <span>SRT <span class="logo-accent">Royal</span></span>
+          </a>
+          <p class="footer-tagline">Connecting businesses with elite frontend designers who build websites that work — and look incredible doing it.</p>
+          <div class="footer-socials">
+            <a href="https://github.com/tawsifgaming373-bot" target="_blank" class="social-link" aria-label="GitHub">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.415-4.033-1.415-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+            </a>
+            <a href="https://wa.me/8801976365076" target="_blank" class="social-link" aria-label="WhatsApp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.198.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884M20.52 3.449C18.24 1.245 15.24 0 12.045 0 5.463 0 .102 5.36.1 11.943c0 2.104.548 4.158 1.588 5.967L0 24l6.335-1.652a11.882 11.882 0 0 0 5.71 1.447h.005c6.581 0 11.943-5.36 11.946-11.944a11.86 11.86 0 0 0-3.476-8.402"/></svg>
+            </a>
+            <a href="mailto:tawsifgaming373@gmail.com" class="social-link" aria-label="Email">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="designers.html#how-it-works">How It Works</a></li>
+            <li><a href="designers.html">Browse Designers</a></li>
+            <li><a href="hire.html">Submit a Request</a></li>
+            <li><a href="index.html#testimonials">Client Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="index.html#about">About SRT Royal</a></li>
+            <li><a href="admin-portfolio.html">Admin Portfolio</a></li>
+            <li><a href="https://github.com/tawsifgaming373-bot/SRT-Royal-Site" target="_blank">GitHub</a></li>
+            <li><a href="Login_page.html">Client Portal</a></li>
+            <li><a href="terms.html">Terms of Service</a></li>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="contact.html">Contact Form</a></li>
+            <li><a href="mailto:tawsifgaming373@gmail.com">tawsifgaming373@gmail.com</a></li>
+            <li><a href="https://wa.me/8801976365076" target="_blank">+880 1976-365076</a></li>
+            <li><span style="color:var(--text-muted)">Bangladesh 🇧🇩</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <span>© 2026 SR. Tawsif</span>
+        <span>Design by SR.Tawsif</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
