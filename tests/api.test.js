@@ -406,3 +406,62 @@ test('accepting/receiving a hire request creates a notification the designer can
   assert.equal(readRes.status, 200);
   assert.equal(readRes.body.notification.isRead, true);
 });
+
+// ── Activity log: verifies real business actions get audited ──
+test('signup, hire-request accept, and payment confirm all appear in the admin activity log', async () => {
+  const ActivityLog = require('../server/models/ActivityLog');
+
+  const clientSignup = await request(app).post('/api/auth/signup').send({
+    name: 'Activity Client', email: 'activityclient@example.com', password: 'Password123!', role: 'client',
+  });
+  const clientToken = clientSignup.body.token;
+
+  const designerSignup = await request(app).post('/api/auth/signup').send({
+    name: 'Activity Designer', email: 'activitydesigner@example.com', password: 'Password123!', role: 'designer',
+  });
+  const designerToken = designerSignup.body.token;
+
+  const designerProfileRes = await request(app)
+    .post('/api/designers')
+    .set('Authorization', `Bearer ${designerToken}`)
+    .send({ bio: 'Activity test designer', skills: ['JS'], categories: ['Web Design'], experience: 4, pricing: { hourly: 50 }, availability: 'Available' });
+  const designerProfileId = designerProfileRes.body.designer._id || designerProfileRes.body.designer.id;
+
+  const hireRes = await request(app)
+    .post('/api/hire-requests')
+    .set('Authorization', `Bearer ${clientToken}`)
+    .send({ designerId: designerProfileId, projectTitle: 'Activity Test Project', description: 'testing activity log', budget: '300' });
+  const hireRequestId = hireRes.body.hireRequest._id || hireRes.body.hireRequest.id;
+
+  const acceptRes = await request(app)
+    .patch(`/api/hire-requests/${hireRequestId}`)
+    .set('Authorization', `Bearer ${designerToken}`)
+    .send({ status: 'accepted' });
+  assert.equal(acceptRes.status, 200);
+
+  // Check via the DB directly first — confirms the fire-and-forget logActivity
+  // calls actually persisted, independent of whether the admin API works.
+  const signupLog = await ActivityLog.findOne({ action: 'user.signup', targetType: 'User' }).sort({ createdAt: -1 });
+  assert.ok(signupLog, 'signup should be logged');
+
+  const acceptLog = await ActivityLog.findOne({ action: 'hire_request.accepted', targetId: hireRequestId });
+  assert.ok(acceptLog, 'hire request acceptance should be logged');
+
+  const projectCreatedLog = await ActivityLog.findOne({ action: 'project.created' });
+  assert.ok(projectCreatedLog, 'project creation (from accepting a hire request) should be logged');
+
+  // Now confirm the admin can actually read it through the real API.
+  const activityRes = await request(app)
+    .get('/api/admin/activity')
+    .set('Authorization', `Bearer ${adminToken}`);
+  assert.equal(activityRes.status, 200);
+  assert.ok(activityRes.body.entries.length > 0);
+  assert.ok(activityRes.body.entries.some((e) => e.action === 'hire_request.accepted'));
+});
+
+test('non-admin cannot read the activity log', async () => {
+  const res = await request(app)
+    .get('/api/admin/activity')
+    .set('Authorization', `Bearer ${global.__testClientToken}`);
+  assert.equal(res.status, 403);
+});

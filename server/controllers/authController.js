@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const { isValidEmail, requireString } = require('../middleware/validation');
 const { sendEmail, notifyOwner } = require('../services/emailService');
+const { logActivity } = require('../services/activityLogService');
 
 function sanitizeUser(user) {
   const doc = user.toObject ? user.toObject() : user;
@@ -56,6 +57,8 @@ async function signup(req, res, next) {
     });
 
     const token = signToken(user);
+
+    logActivity({ actor: user._id, actorRole: user.role, action: 'user.signup', targetType: 'User', targetId: user._id, metadata: { name: user.name, role: user.role } });
 
     notifyOwner({
       subject: `New account created: ${user.name}`,

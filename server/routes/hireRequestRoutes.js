@@ -5,6 +5,7 @@ const Designer = require('../models/Designer');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const { requireObjectId, requireString, isValidEmail, pagination } = require('../middleware/validation');
 const { createNotification } = require('../services/notificationService');
+const { logActivity } = require('../services/activityLogService');
 const { sendEmail } = require('../services/emailService');
 const Project = require('../models/Project');
 
@@ -86,6 +87,14 @@ router.post('/', optionalAuth, async (req, res, next) => {
     if (designer) {
       await createNotification({ user: designer.user, type: 'hire_request', message: `New hire request: ${request.projectTitle}.`, metadata: { hireRequestId: request.id } });
     }
+    logActivity({
+      actor: req.user ? req.user.id : null,
+      actorRole: req.user ? req.user.role : 'client',
+      action: 'hire_request.created',
+      targetType: 'HireRequest',
+      targetId: request._id,
+      metadata: { projectTitle: request.projectTitle, designerAssigned: !!designer },
+    });
 
     // Best-effort email to the site owner; never fails the request.
     if (process.env.OWNER_EMAIL) {
@@ -133,9 +142,15 @@ router.patch('/:id', requireAuth, async (req, res, next) => {
     }
     request.status = nextStatus;
     await request.save();
+    logActivity({
+      actor: req.user.id, actorRole: req.user.role,
+      action: `hire_request.${nextStatus}`, targetType: 'HireRequest', targetId: request._id,
+      metadata: { projectTitle: request.projectTitle },
+    });
     if (nextStatus === 'accepted') {
       const project = await Project.create({ client: request.client, designer: request.designer, hireRequest: request._id, title: request.projectTitle, description: request.description, budget: request.budget, deadline: request.deadline });
       await createNotification({ user: request.client, type: 'hire_accepted', message: `Your hire request was accepted. Project ${project.title} was created.`, metadata: { hireRequestId: request.id } });
+      logActivity({ actor: req.user.id, actorRole: req.user.role, action: 'project.created', targetType: 'Project', targetId: project._id, metadata: { title: project.title } });
       return res.json({ hireRequest: request, project });
     }
     const notifyUser = isClient ? requestDesigner?.user : request.client;

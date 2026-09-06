@@ -1078,6 +1078,10 @@ async function renderCEOProfile(user) {
       <h4 class="profile-sub-title">✉️ Contact Messages</h4>
       <p class="text-muted" id="adminMsgLoadingMsg">Loading messages…</p>
     </div>
+    <div id="adminActivityWrap" style="margin-top:32px;">
+      <h4 class="profile-sub-title">🕒 Recent Activity</h4>
+      <p class="text-muted" id="adminActivityLoadingMsg">Loading activity…</p>
+    </div>
   `;
 
   $("#logoutBtn")?.addEventListener("click", () => {
@@ -1222,6 +1226,48 @@ async function renderCEOProfile(user) {
   } catch (_) {
     const wrap = $("#adminMessagesWrap");
     if (wrap) wrap.innerHTML = `<h4 class="profile-sub-title">✉️ Contact Messages</h4><p class="text-muted">Could not load messages.</p>`;
+  }
+
+  // Load recent activity log
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/activity?limit=40`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await safeJsonResponse(res);
+    const entries = data.entries || [];
+
+    const actionLabels = {
+      'user.signup': '👤 signed up',
+      'hire_request.created': '📥 submitted a hire request',
+      'hire_request.accepted': '✅ accepted a hire request',
+      'hire_request.rejected': '❌ rejected a hire request',
+      'project.created': '🗂️ project created',
+      'project.completed': '🏁 marked a project completed',
+      'project.in_progress': '▶️ started a project',
+      'payment.created': '💳 initiated a payment',
+      'payment.confirmed': '✅ confirmed a payment',
+      'designer.approved': '🎨 designer approved',
+      'designer.rejected': '🚫 designer rejected',
+    };
+
+    const activityHtml = entries.length === 0
+      ? `<p class="text-muted">No activity recorded yet.</p>`
+      : `<div class="table-wrap"><table class="requests-table">
+          <thead><tr><th>Who</th><th>Action</th><th>When</th></tr></thead>
+          <tbody>${entries.map((e) => `
+            <tr>
+              <td>${escapeHtml((e.actor && e.actor.name) || (e.actorRole === 'system' ? 'System' : 'Unknown'))} <span class="text-muted" style="font-size:.78rem;">(${escapeHtml(e.actorRole)})</span></td>
+              <td>${actionLabels[e.action] || escapeHtml(e.action)}</td>
+              <td style="color:var(--text-muted);font-size:.8rem;">${new Date(e.createdAt).toLocaleString()}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table></div>`;
+
+    const wrap = $("#adminActivityWrap");
+    if (wrap) wrap.innerHTML = `<h4 class="profile-sub-title">🕒 Recent Activity</h4>${activityHtml}`;
+  } catch (_) {
+    const wrap = $("#adminActivityWrap");
+    if (wrap) wrap.innerHTML = `<h4 class="profile-sub-title">🕒 Recent Activity</h4><p class="text-muted">Could not load activity.</p>`;
   }
 }
 

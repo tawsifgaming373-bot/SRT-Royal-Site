@@ -5,6 +5,7 @@ const { requireAuth, requireRole } = require('../middleware/auth');
 const { requireObjectId, requireString } = require('../middleware/validation');
 const { calculateRevenueSplit } = require('../config/businessRules');
 const { assertGatewaySupported } = require('../services/paymentService');
+const { logActivity } = require('../services/activityLogService');
 
 const router = express.Router();
 router.use(requireAuth);
@@ -58,6 +59,12 @@ router.post('/', async (req, res, next) => {
 
     project.paymentStatus = 'pending';
     await project.save();
+
+    logActivity({
+      actor: req.user.id, actorRole: req.user.role,
+      action: 'payment.created', targetType: 'Payment', targetId: payment._id,
+      metadata: { amount: split.grossAmount, gateway, projectId: project._id },
+    });
 
     return res.status(202).json({
       payment,
@@ -133,6 +140,11 @@ router.patch('/:id/confirm', requireRole('admin'), async (req, res, next) => {
       project.paymentStatus = 'paid';
       await project.save();
     }
+    logActivity({
+      actor: req.user.id, actorRole: req.user.role,
+      action: 'payment.confirmed', targetType: 'Payment', targetId: payment._id,
+      metadata: { amount: payment.amount, developerShare: payment.developerShare, platformShare: payment.platformShare },
+    });
 
     return res.json({ payment, message: 'Payment confirmed as paid.' });
   } catch (error) { return next(error); }

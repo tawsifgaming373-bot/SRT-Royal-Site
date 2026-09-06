@@ -3,6 +3,7 @@ const Project = require('../models/Project');
 const { requireAuth } = require('../middleware/auth');
 const { pagination, requireObjectId, requireString } = require('../middleware/validation');
 const { createNotification } = require('../services/notificationService');
+const { logActivity } = require('../services/activityLogService');
 const Designer = require('../models/Designer');
 
 const router = express.Router();
@@ -51,6 +52,7 @@ router.patch('/:id/status', async (req, res, next) => {
     if (!Object.prototype.hasOwnProperty.call(allowed, status)) return res.status(400).json({ message: 'Invalid project status.' });
     project.status = status;
     await project.save();
+    logActivity({ actor: req.user.id, actorRole: req.user.role, action: `project.${status}`, targetType: 'Project', targetId: project._id, metadata: { title: project.title } });
     const projectDesigner = await Designer.findById(project.designer).select('user').lean();
     const recipient = String(project.client) === String(req.user.id) ? projectDesigner?.user : project.client;
     if (recipient) {

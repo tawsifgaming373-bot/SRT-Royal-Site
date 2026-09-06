@@ -8,6 +8,7 @@ const ContactMessage = require('../models/ContactMessage');
 const Payment = require('../models/Payment');
 const { requireAuth, requireRole } = require('../middleware/auth');
 const { requireObjectId, requireString } = require('../middleware/validation');
+const { logActivity } = require('../services/activityLogService');
 
 const router = express.Router();
 
@@ -195,6 +196,11 @@ router.patch('/designers/:id/status', async (req, res, next) => {
       designer.rejectionReason = requireString(req.body.reason, 'Rejection reason', { max: 500 });
     }
     await designer.save();
+    logActivity({
+      actor: req.user.id, actorRole: 'admin',
+      action: `designer.${nextStatus}`, targetType: 'Designer', targetId: designer._id,
+      metadata: { reason: nextStatus === 'rejected' ? designer.rejectionReason : undefined },
+    });
 
     if (nextStatus === 'approved') {
       // Grants designer-only API access (hire request handling, etc).
@@ -205,6 +211,22 @@ router.patch('/designers/:id/status', async (req, res, next) => {
     }
 
     return res.json({ designer, message: `Designer application ${nextStatus}.` });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+// ── Activity log — recent significant platform actions, for the audit trail ──
+router.get('/activity', async (req, res, next) => {
+  try {
+    const ActivityLog = require('../models/ActivityLog');
+    const limit = Math.min(Number(req.query.limit) || 50, 100);
+    const entries = await ActivityLog.find()
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate('actor', 'name email role')
+      .lean();
+    return res.json({ entries });
   } catch (error) {
     return next(error);
   }
