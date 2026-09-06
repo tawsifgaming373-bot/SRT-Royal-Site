@@ -475,15 +475,23 @@ async function loadFullProfile() {
     const requestsRes = await fetch(`${API_BASE}/api/hire-requests`, { headers: { Authorization: `Bearer ${token}` } });
     const requestsData = await safeJsonResponse(requestsRes);
     window._srtHireRequests = requestsData.hireRequests || [];
+
     const projectsRes = await fetch(`${API_BASE}/api/projects`, { headers: { Authorization: `Bearer ${token}` } });
     const projectsData = await safeJsonResponse(projectsRes);
+    window._srtProjects = projectsData.projects || [];
+
     const projectSelect = $("#reviewProject");
-    (projectsData.projects || []).filter((project) => project.status === "completed").forEach((project) => {
+    window._srtProjects.filter((project) => project.status === "completed").forEach((project) => {
       const option = document.createElement("option");
       option.value = project._id || project.id;
       option.textContent = project.title;
       projectSelect?.appendChild(option);
     });
+
+    if (data.user && data.user.role === "designer") {
+      const earningsRes = await fetch(`${API_BASE}/api/payments/my-earnings`, { headers: { Authorization: `Bearer ${token}` } });
+      window._srtEarnings = earningsRes.ok ? await safeJsonResponse(earningsRes) : { payments: [], totalEarned: 0 };
+    }
   } catch (_) {}
 }
 
@@ -607,6 +615,236 @@ async function updateHireStatus(requestId, newStatus) {
     alert("Status update failed: " + err.message);
     return null;
   }
+}
+
+async function updateProjectStatus(projectId, newStatus) {
+  const token = getToken();
+  if (!token) return null;
+  try {
+    const res = await fetch(`${API_BASE}/api/projects/${projectId}/status`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    const data = await safeJsonResponse(res);
+    if (!res.ok) throw new Error(data.message || "Status update failed");
+    return data.project;
+  } catch (err) {
+    alert("Status update failed: " + err.message);
+    return null;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   RENDER PROFILE: DESIGNER VIEW
+───────────────────────────────────────────── */
+function renderDesignerProfile(user, hireRequests, projects, earnings) {
+  const profileContent = $("#profileContent");
+  if (!profileContent) return;
+
+  const memberSince = user.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    : "Unknown";
+
+  const pendingRequests = (hireRequests || []).filter((r) => r.status === "pending");
+  const otherRequests = (hireRequests || []).filter((r) => r.status !== "pending");
+
+  const pendingHtml = pendingRequests.length === 0
+    ? `<p class="text-muted" style="padding:12px 0;">No new hire requests right now.</p>`
+    : pendingRequests.map((r) => `
+        <div class="hire-request-card" style="border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <strong>${escapeHtml(r.projectTitle || "—")}</strong>
+              <p class="text-muted" style="margin:4px 0;font-size:.88rem;">${escapeHtml((r.description || "").slice(0, 140))}${(r.description || "").length > 140 ? "…" : ""}</p>
+              <p class="text-muted" style="font-size:.82rem;">Budget: ${escapeHtml(r.budgetLabel || String(r.budget || "—"))} · Timeline: ${escapeHtml(r.timeline || "—")}</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-start;">
+              <button class="btn btn-gold btn-sm hire-accept-btn" data-id="${r._id || r.id}">Accept</button>
+              <button class="btn btn-outline btn-sm hire-reject-btn" data-id="${r._id || r.id}">Reject</button>
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+  const historyRows = otherRequests.length === 0 ? "" : `
+    <div class="table-wrap" style="margin-top:14px;">
+      <table class="requests-table">
+        <thead><tr><th>Project</th><th>Budget</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>${otherRequests.map((r) => `
+          <tr>
+            <td>${escapeHtml(r.projectTitle || "—")}</td>
+            <td>${escapeHtml(r.budgetLabel || String(r.budget || "—"))}</td>
+            <td>${statusBadge(r.status || "pending")}</td>
+            <td style="color:var(--text-muted);font-size:.8rem;">${new Date(r.createdAt).toLocaleDateString()}</td>
+          </tr>
+        `).join("")}</tbody>
+      </table>
+    </div>
+  `;
+
+  const projectTransitions = { pending: "in_progress", in_progress: "completed" };
+  const projectActionLabel = { pending: "Start Project", in_progress: "Mark Completed" };
+  const projectsHtml = (projects || []).length === 0
+    ? `<p class="text-muted" style="padding:12px 0;">No projects yet.</p>`
+    : `<div class="table-wrap">
+        <table class="requests-table">
+          <thead><tr><th>Project</th><th>Client</th><th>Budget</th><th>Status</th><th></th></tr></thead>
+          <tbody>${projects.map((p) => `
+            <tr id="project-row-${p._id || p.id}">
+              <td>${escapeHtml(p.title || "—")}</td>
+              <td>${escapeHtml((p.client && p.client.name) || "—")}</td>
+              <td>${escapeHtml(String(p.budget || "—"))}</td>
+              <td id="project-status-${p._id || p.id}">${statusBadge(p.status || "pending")}</td>
+              <td>${projectTransitions[p.status] ? `<button class="btn btn-outline btn-sm project-advance-btn" data-id="${p._id || p.id}" data-next="${projectTransitions[p.status]}">${projectActionLabel[p.status]}</button>` : ""}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      </div>`;
+
+  const paidPayments = (earnings?.payments || []).filter((p) => p.status === "paid");
+  const earningsRows = paidPayments.length === 0
+    ? `<p class="text-muted" style="padding:12px 0;">No confirmed payments yet.</p>`
+    : `<div class="table-wrap">
+        <table class="requests-table">
+          <thead><tr><th>Project</th><th>Your Share</th><th>Client</th><th>Paid On</th></tr></thead>
+          <tbody>${paidPayments.map((p) => `
+            <tr>
+              <td>${escapeHtml((p.project && p.project.title) || "—")}</td>
+              <td>${escapeHtml(p.currency || "BDT")} ${p.developerShare}</td>
+              <td>${escapeHtml((p.user && p.user.name) || "—")}</td>
+              <td style="color:var(--text-muted);font-size:.8rem;">${p.completedAt ? new Date(p.completedAt).toLocaleDateString() : "—"}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      </div>`;
+
+  profileContent.innerHTML = `
+    <div class="profile-header">
+      <div class="profile-avatar-wrap" id="profileAvatarWrap">
+        ${user.photo
+          ? `<img src="${escapeHtml(user.photo)}" alt="Profile" class="profile-photo" id="profilePhotoImg"/>`
+          : `<div class="profile-avatar" id="profileAvatarInitial">${(user.name || user.email || "?").charAt(0).toUpperCase()}</div>`
+        }
+        <label class="photo-upload-btn" title="Change photo">
+          📷
+          <input type="file" id="photoFileInput" accept="image/*" style="display:none;"/>
+        </label>
+      </div>
+      <div>
+        <h3>Welcome, ${escapeHtml(user.name || "Designer")}</h3>
+        <p class="text-muted"><a href="mailto:${escapeHtml(user.email || "")}">${escapeHtml(user.email || "")}</a></p>
+        <p class="client-id-badge">🎨 Designer</p>
+        <p class="member-since">📅 Member since ${memberSince}</p>
+      </div>
+    </div>
+
+    <div class="profile-edit-wrap" id="profileEditWrap" style="display:none;">
+      <h4 class="profile-sub-title">✏️ Edit Profile</h4>
+      <div class="form-row-two">
+        <div class="form-group"><label>Full Name</label><input type="text" id="editName" value="${escapeHtml(user.name || "")}" class="form-input"/></div>
+        <div class="form-group"><label>Phone</label><input type="text" id="editPhone" value="${escapeHtml(user.phone || "")}" class="form-input"/></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:8px;">
+        <button class="btn btn-gold" id="saveProfileBtn">💾 Save Changes</button>
+        <button class="btn btn-outline" id="cancelEditBtn">Cancel</button>
+      </div>
+      <p class="form-success hidden" id="editSuccess">✅ Profile updated!</p>
+    </div>
+
+    <div class="profile-actions">
+      <button class="btn btn-outline" id="editProfileBtn">✏️ Edit Profile</button>
+      <button class="btn btn-outline" id="logoutBtn">Sign Out</button>
+    </div>
+
+    <div class="earnings-summary" style="margin-top:28px;padding:20px;border:1px solid var(--border);border-radius:var(--radius);">
+      <h4 class="profile-sub-title" style="margin-top:0;">💰 Total Earned</h4>
+      <p style="font-size:1.8rem;font-weight:800;color:var(--gold, #FFD700);margin:0;">৳${(earnings?.totalEarned || 0).toLocaleString()}</p>
+      <p class="text-muted" style="font-size:.82rem;">From confirmed payments only. Your share is always 50% of what the client pays, calculated on the server.</p>
+    </div>
+
+    <div style="margin-top:28px;">
+      <h4 class="profile-sub-title">📥 New Hire Requests${pendingRequests.length ? ` (${pendingRequests.length})` : ""}</h4>
+      ${pendingHtml}
+      ${historyRows}
+    </div>
+
+    <div style="margin-top:28px;">
+      <h4 class="profile-sub-title">🗂️ My Projects</h4>
+      ${projectsHtml}
+    </div>
+
+    <div style="margin-top:28px;">
+      <h4 class="profile-sub-title">💳 Payment History</h4>
+      ${earningsRows}
+    </div>
+  `;
+
+  $("#photoFileInput")?.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const label = $(".photo-upload-btn");
+    if (label) label.textContent = "⏳";
+    const photoUrl = await uploadPhoto(file);
+    if (photoUrl) updateAuthUI();
+    if (label) label.textContent = "📷";
+  });
+
+  $("#editProfileBtn")?.addEventListener("click", () => {
+    $("#profileEditWrap").style.display = "block";
+    $("#editProfileBtn").style.display = "none";
+  });
+  $("#cancelEditBtn")?.addEventListener("click", () => {
+    $("#profileEditWrap").style.display = "none";
+    $("#editProfileBtn").style.display = "";
+  });
+  $("#saveProfileBtn")?.addEventListener("click", async () => {
+    const name = $("#editName")?.value.trim();
+    const phone = $("#editPhone")?.value.trim();
+    if (!name) { alert("Name cannot be empty."); return; }
+    const btn = $("#saveProfileBtn");
+    btn.disabled = true; btn.textContent = "Saving…";
+    const ok = await saveProfileEdit(name, "", phone);
+    btn.disabled = false; btn.textContent = "💾 Save Changes";
+    if (ok) {
+      showMsg($("#editSuccess"), "✅ Profile updated!");
+      setTimeout(() => updateAuthUI(), 800);
+    }
+  });
+
+  $("#logoutBtn")?.addEventListener("click", () => {
+    clearAuth();
+    window._srtHireRequests = [];
+    window._srtProjects = [];
+    updateAuthUI();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  $$(".hire-accept-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      btn.disabled = true; btn.textContent = "Accepting…";
+      const result = await updateHireStatus(btn.dataset.id, "accepted");
+      if (result) { await loadFullProfile(); updateAuthUI(); }
+      else { btn.disabled = false; btn.textContent = "Accept"; }
+    });
+  });
+  $$(".hire-reject-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Reject this hire request?")) return;
+      btn.disabled = true; btn.textContent = "Rejecting…";
+      const result = await updateHireStatus(btn.dataset.id, "rejected");
+      if (result) { await loadFullProfile(); updateAuthUI(); }
+      else { btn.disabled = false; btn.textContent = "Reject"; }
+    });
+  });
+  $$(".project-advance-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      const result = await updateProjectStatus(btn.dataset.id, btn.dataset.next);
+      if (result) { await loadFullProfile(); updateAuthUI(); }
+      else { btn.disabled = false; }
+    });
+  });
 }
 
 /* ─────────────────────────────────────────────
@@ -1029,6 +1267,11 @@ function updateAuthUI() {
   if (loggedIn) {
     if (user.role === "admin") {
       renderCEOProfile(user);
+    } else if (user.role === "designer") {
+      const hireRequests = window._srtHireRequests || [];
+      const projects = window._srtProjects || [];
+      const earnings = window._srtEarnings || { payments: [], totalEarned: 0 };
+      renderDesignerProfile(user, hireRequests, projects, earnings);
     } else {
       const hireRequests = window._srtHireRequests || [];
       renderClientProfile(user, hireRequests);

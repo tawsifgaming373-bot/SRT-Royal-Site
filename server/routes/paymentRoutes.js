@@ -78,6 +78,32 @@ router.get('/project/:projectId', async (req, res, next) => {
 });
 
 /**
+ * A designer's own earnings — every payment where they're the designer,
+ * plus a running total of what's actually been paid out (status: 'paid').
+ * Pending/failed payments show up too but don't count toward the total,
+ * since that money hasn't actually been confirmed yet.
+ */
+router.get('/my-earnings', async (req, res, next) => {
+  try {
+    const Designer = require('../models/Designer');
+    const designer = await Designer.findOne({ user: req.user.id }).select('_id').lean();
+    if (!designer) return res.status(403).json({ message: 'Only designers have earnings.' });
+
+    const payments = await Payment.find({ designer: designer._id })
+      .sort({ createdAt: -1 })
+      .populate('project', 'title')
+      .populate('user', 'name')
+      .lean();
+
+    const totalEarned = payments
+      .filter((p) => p.status === 'paid')
+      .reduce((sum, p) => sum + p.developerShare, 0);
+
+    return res.json({ payments, totalEarned });
+  } catch (error) { return next(error); }
+});
+
+/**
  * ADMIN ONLY — manually confirm a payment as received (bank transfer, bKash
  * SMS, cash, etc.), since no automated gateway is wired up yet. This is the
  * "development mode" the payment system runs in until a real gateway with

@@ -337,3 +337,27 @@ test('admin revenue endpoint reflects the confirmed payment', async () => {
   assert.equal(res.body.developerEarnings, 100);
   assert.equal(res.body.platformEarnings, 100);
 });
+
+// ── Designer earnings endpoint ──
+test('designer earnings endpoint returns their confirmed payments and excludes others', async () => {
+  const jwt = require('jsonwebtoken');
+  const User = require('../server/models/User');
+  const designerUser = await User.findOne({ email: 'paydesigner@example.com' });
+  const designerToken = jwt.sign({ id: designerUser._id.toString(), email: designerUser.email, role: designerUser.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+  const res = await request(app)
+    .get('/api/payments/my-earnings')
+    .set('Authorization', `Bearer ${designerToken}`);
+
+  assert.equal(res.status, 200);
+  assert.equal(res.body.totalEarned, 100, 'should equal the developerShare of the one confirmed payment');
+  assert.equal(res.body.payments.length, 1);
+});
+
+test('a client (not a designer) gets 403 from the earnings endpoint', async () => {
+  const res = await request(app)
+    .get('/api/payments/my-earnings')
+    .set('Authorization', `Bearer ${global.__testClientToken}`);
+
+  assert.equal(res.status, 403);
+});
