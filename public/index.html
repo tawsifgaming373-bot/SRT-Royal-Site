@@ -55,6 +55,20 @@
         <li><a href="contact.html" class="nav-link">Contact</a></li>
         <li><a href="Login_page.html" class="nav-link" id="navAuthLink">Login</a></li>
         <li><a href="index.html#profile-section" class="nav-link nav-login-link hidden" id="navProfileLink">My Account</a></li>
+        <li class="nav-notif-wrap hidden" id="navNotifWrap">
+          <button class="nav-notif-btn" id="navNotifBtn" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+            🔔<span class="nav-notif-badge hidden" id="navNotifBadge">0</span>
+          </button>
+          <div class="nav-notif-dropdown hidden" id="navNotifDropdown">
+            <div class="nav-notif-dropdown-header">
+              <strong>Notifications</strong>
+              <button class="nav-notif-markall" id="navNotifMarkAll">Mark all read</button>
+            </div>
+            <div class="nav-notif-list" id="navNotifList">
+              <p class="text-muted" style="padding:16px;text-align:center;">No notifications yet.</p>
+            </div>
+          </div>
+        </li>
         <li><a href="hire.html" class="btn btn-gold nav-cta">Let's Work Together</a></li>
       </ul>
 

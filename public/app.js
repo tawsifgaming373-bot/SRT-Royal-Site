@@ -1250,6 +1250,74 @@ const navAuthLink    = $("#navAuthLink");
 const navProfileLink = $("#navProfileLink");
 const authSection    = $("#auth-section");
 const profileSection = $("#profile-section");
+const navNotifWrap    = $("#navNotifWrap");
+const navNotifBtn     = $("#navNotifBtn");
+const navNotifBadge   = $("#navNotifBadge");
+const navNotifDropdown = $("#navNotifDropdown");
+const navNotifList    = $("#navNotifList");
+const navNotifMarkAll = $("#navNotifMarkAll");
+
+async function loadNotifications() {
+  const token = getToken();
+  if (!token || !navNotifList) return;
+  try {
+    const res = await fetch(`${API_BASE}/api/notifications?limit=15`, { headers: { Authorization: `Bearer ${token}` } });
+    const data = await safeJsonResponse(res);
+    const notifications = data.notifications || [];
+    const unread = data.unread || 0;
+
+    if (navNotifBadge) {
+      navNotifBadge.textContent = unread > 9 ? "9+" : String(unread);
+      navNotifBadge.classList.toggle("hidden", unread === 0);
+    }
+
+    navNotifList.innerHTML = notifications.length === 0
+      ? `<p class="text-muted" style="padding:16px;text-align:center;">No notifications yet.</p>`
+      : notifications.map((n) => `
+          <button class="nav-notif-item ${n.isRead ? "" : "unread"}" data-id="${n._id || n.id}">
+            ${escapeHtml(n.message)}
+            <span class="notif-time">${new Date(n.createdAt).toLocaleString()}</span>
+          </button>
+        `).join("");
+
+    $$(".nav-notif-item", navNotifList).forEach((item) => {
+      item.addEventListener("click", async () => {
+        const token2 = getToken();
+        if (!token2) return;
+        try {
+          await fetch(`${API_BASE}/api/notifications/${item.dataset.id}/read`, {
+            method: "PATCH",
+            headers: { Authorization: `Bearer ${token2}` },
+          });
+          item.classList.remove("unread");
+          loadNotifications();
+        } catch (_) {}
+      });
+    });
+  } catch (_) {}
+}
+
+navNotifBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const isOpen = !navNotifDropdown.classList.contains("hidden");
+  navNotifDropdown.classList.toggle("hidden", isOpen);
+  navNotifBtn.setAttribute("aria-expanded", String(!isOpen));
+  if (!isOpen) loadNotifications();
+});
+document.addEventListener("click", (e) => {
+  if (navNotifDropdown && !navNotifDropdown.classList.contains("hidden") && !navNotifWrap?.contains(e.target)) {
+    navNotifDropdown.classList.add("hidden");
+    navNotifBtn?.setAttribute("aria-expanded", "false");
+  }
+});
+navNotifMarkAll?.addEventListener("click", async () => {
+  const token = getToken();
+  if (!token) return;
+  try {
+    await fetch(`${API_BASE}/api/notifications/read-all`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } });
+    loadNotifications();
+  } catch (_) {}
+});
 
 function updateAuthUI() {
   const user = getUser();
@@ -1257,8 +1325,11 @@ function updateAuthUI() {
 
   navAuthLink?.classList.toggle("hidden", loggedIn);
   navProfileLink?.classList.toggle("hidden", !loggedIn);
+  navNotifWrap?.classList.toggle("hidden", !loggedIn);
   authSection?.classList.toggle("hidden", loggedIn);
   profileSection?.classList.toggle("hidden", !loggedIn);
+
+  if (loggedIn) loadNotifications();
 
   if (loggedIn && navProfileLink) {
     navProfileLink.href = portalUrlFor(user);

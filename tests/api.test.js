@@ -361,3 +361,48 @@ test('a client (not a designer) gets 403 from the earnings endpoint', async () =
 
   assert.equal(res.status, 403);
 });
+
+// ── Notification bell: real flow, not just the DB model ──
+test('accepting/receiving a hire request creates a notification the designer can read and mark read', async () => {
+  const jwt = require('jsonwebtoken');
+  const User = require('../server/models/User');
+
+  // Fresh client + designer for this test so it doesn't depend on ordering
+  // or state from other tests.
+  const clientSignup = await request(app).post('/api/auth/signup').send({
+    name: 'Notif Client', email: 'notifclient@example.com', password: 'Password123!', role: 'client',
+  });
+  const clientToken = clientSignup.body.token;
+
+  const designerSignup = await request(app).post('/api/auth/signup').send({
+    name: 'Notif Designer', email: 'notifdesigner@example.com', password: 'Password123!', role: 'designer',
+  });
+  const designerUserId = designerSignup.body.user.id || designerSignup.body.user._id;
+  const designerToken = designerSignup.body.token;
+
+  const designerProfileRes = await request(app)
+    .post('/api/designers')
+    .set('Authorization', `Bearer ${designerToken}`)
+    .send({ bio: 'Notif test designer', skills: ['CSS'], categories: ['Web Design'], experience: 2, pricing: { hourly: 40 }, availability: 'Available' });
+  const designerProfileId = designerProfileRes.body.designer._id || designerProfileRes.body.designer.id;
+
+  const hireRes = await request(app)
+    .post('/api/hire-requests')
+    .set('Authorization', `Bearer ${clientToken}`)
+    .send({ designerId: designerProfileId, projectTitle: 'Notif Test Project', description: 'testing notifications', budget: '100' });
+  assert.equal(hireRes.status, 201);
+
+  const notifRes = await request(app)
+    .get('/api/notifications')
+    .set('Authorization', `Bearer ${designerToken}`);
+  assert.equal(notifRes.status, 200);
+  assert.ok(notifRes.body.unread >= 1, 'designer should have at least one unread notification for the new hire request');
+  const targetNotif = notifRes.body.notifications.find((n) => n.type === 'hire_request');
+  assert.ok(targetNotif, 'a hire_request notification should exist');
+
+  const readRes = await request(app)
+    .patch(`/api/notifications/${targetNotif._id}/read`)
+    .set('Authorization', `Bearer ${designerToken}`);
+  assert.equal(readRes.status, 200);
+  assert.equal(readRes.body.notification.isRead, true);
+});
